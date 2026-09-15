@@ -100,7 +100,7 @@ export class StaffRenderer {
       }
     }
     if (diatonicStep >= 10) {
-      for (let s = 10; s <= diatonicStep; s -= 2) {
+      for (let s = 10; s <= diatonicStep; s += 2) {
         const ly = this.getYForStep(s);
         this.ctx.beginPath();
         this.ctx.moveTo(x - 13, ly);

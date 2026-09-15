@@ -103,6 +103,9 @@ export class FretboardRenderer {
   }
 
   setTargetHint(targetMidi) {
+    if (this.lastHintMidi === targetMidi) return;
+    this.lastHintMidi = targetMidi;
+
     let scrollToEl = null;
     for (let s = 0; s < STRINGS.length; s++) {
       for (let f = 0; f <= this.maxFrets; f++) {
@@ -126,10 +129,16 @@ export class FretboardRenderer {
       if (targetLeft > card.scrollLeft + card.clientWidth - 100 || targetLeft < card.scrollLeft) {
         card.scrollTo({ left: Math.max(0, targetLeft - 180), behavior: 'smooth' });
       }
+    } else if (targetMidi !== null && this.container.parentElement) {
+      const card = this.container.parentElement;
+      if (card.scrollLeft > 200) {
+        card.scrollTo({ left: 0, behavior: 'smooth' });
+      }
     }
   }
 
   clearHints() {
+    this.lastHintMidi = null;
     this.setTargetHint(null);
   }
 }
