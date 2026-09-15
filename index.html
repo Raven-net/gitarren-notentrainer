@@ -59,6 +59,12 @@
           <input type="range" id="speed-slider" min="0.5" max="3.0" step="0.1" value="1.2">
           <span id="speed-val" class="bpm-badge">1.2x</span>
         </div>
+
+        <div class="control-group">
+          <button id="fretboard-toggle-btn" class="btn" title="Griffbrett ein- oder ausblenden (Konzentration auf das reine Notenlesen)">
+            🎸 Griffbrett: An
+          </button>
+        </div>
       </div>
 
       <!-- Reihe 2: Status, Pegel-Meter, Audio-Verbindung -->
@@ -104,7 +110,7 @@
     </section>
 
     <!-- Griffbrett-Darstellung (Bund 0 bis 15) -->
-    <section class="fretboard-card">
+    <section class="fretboard-card" id="fretboard-card">
       <div class="fretboard" id="fretboard"></div>
     </section>
 

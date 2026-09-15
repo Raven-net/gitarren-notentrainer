@@ -14,13 +14,18 @@ import { MidiImporter } from './midi/MidiImporter.js';
 class GuitarApp {
   constructor() {
     this.songs = [...BUILTIN_SONGS.map(s => new Song(s))];
+    this.loadCustomSongsFromStorage();
     this.currentSong = this.songs[0];
     this.currentModeName = 'practice'; // 'practice' | 'rhythm' | 'endless' | 'editor'
 
     // DOM-Elemente
     this.canvasEl = document.getElementById('notation-canvas');
     this.fretboardEl = document.getElementById('fretboard');
+    this.fretboardCardEl = document.getElementById('fretboard-card');
+    this.fretboardToggleBtn = document.getElementById('fretboard-toggle-btn');
     this.editorContainerEl = document.getElementById('editor-panel');
+
+    this.isFretboardVisible = localStorage.getItem('fretboard_visible') !== '0';
 
     this.modeSelect = document.getElementById('mode-select');
     this.songSelect = document.getElementById('song-select');
@@ -165,6 +170,16 @@ class GuitarApp {
       this.hideEvaluationModal();
     });
 
+    if (this.fretboardToggleBtn) {
+      this.fretboardToggleBtn.addEventListener('click', () => {
+        this.isFretboardVisible = !this.isFretboardVisible;
+        localStorage.setItem('fretboard_visible', this.isFretboardVisible ? '1' : '0');
+        this.applyFretboardVisibility();
+      });
+    }
+
+    this.applyFretboardVisibility();
+
     // Window Resize -> HiDPI Canvas anpassen
     window.addEventListener('resize', () => {
       this.staffRenderer.initHiDPI();
@@ -198,12 +213,67 @@ class GuitarApp {
     }
   }
 
+  loadCustomSongsFromStorage() {
+    try {
+      const saved = localStorage.getItem('custom_guitar_songs');
+      if (saved) {
+        const list = JSON.parse(saved);
+        list.forEach(songData => {
+          if (!this.songs.some(s => s.id === songData.id)) {
+            this.songs.push(new Song(songData));
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Fehler beim Laden gespeicherter Songs:", e);
+    }
+  }
+
+  saveCustomSongToStorage(song) {
+    try {
+      const saved = localStorage.getItem('custom_guitar_songs');
+      let list = saved ? JSON.parse(saved) : [];
+      list = list.filter(s => s.id !== song.id);
+      list.unshift(song.toJSON());
+      localStorage.setItem('custom_guitar_songs', JSON.stringify(list));
+    } catch (e) {
+      console.error("Fehler beim Speichern des Songs:", e);
+    }
+  }
+
   registerNewSong(song) {
-    this.songs.unshift(song);
+    this.saveCustomSongToStorage(song);
+    const existingIdx = this.songs.findIndex(s => s.id === song.id);
+    if (existingIdx >= 0) {
+      this.songs[existingIdx] = song;
+    } else {
+      this.songs.unshift(song);
+    }
     this.populateSongSelect();
     this.songSelect.value = song.id;
     this.currentSong = song;
     this.setMode('practice');
+  }
+
+  applyFretboardVisibility() {
+    if (!this.fretboardCardEl || !this.fretboardToggleBtn) return;
+    if (this.currentModeName === 'editor') {
+      // Im Editor Griffbrett immer eingeblendet lassen für Notenauswahl
+      this.fretboardCardEl.style.display = 'block';
+      this.fretboardToggleBtn.style.display = 'none';
+      return;
+    }
+
+    this.fretboardToggleBtn.style.display = 'inline-flex';
+    if (this.isFretboardVisible) {
+      this.fretboardCardEl.style.display = 'block';
+      this.fretboardToggleBtn.innerText = '🎸 Griffbrett: An';
+      this.fretboardToggleBtn.classList.remove('btn-danger');
+    } else {
+      this.fretboardCardEl.style.display = 'none';
+      this.fretboardToggleBtn.innerText = '🎸 Griffbrett: Aus';
+      this.fretboardToggleBtn.classList.add('btn-danger');
+    }
   }
 
   setMode(mode) {
@@ -211,6 +281,7 @@ class GuitarApp {
     this.rhythmMode.stop();
     this.updateRhythmButtonState(false);
     this.editorMode.hide();
+    this.applyFretboardVisibility();
 
     // Sichtbarkeit der Steuerelemente steuern
     this.songSelectGroup.style.display = (mode === 'practice' || mode === 'rhythm') ? 'flex' : 'none';

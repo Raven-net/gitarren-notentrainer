@@ -48,9 +48,10 @@ export class SongEditorMode {
 
       <div class="editor-actions">
         <button id="editor-play-btn" class="btn btn-success">▶ Playback</button>
+        <button id="editor-save-btn" class="btn btn-primary" title="Speichert das Lied direkt in der Liederliste deines Browsers">⭐ In Liederliste speichern</button>
+        <button id="editor-export-btn" class="btn">💾 Als JSON exportieren</button>
         <button id="editor-undo-btn" class="btn">↶ Letzte Note löschen</button>
         <button id="editor-clear-btn" class="btn btn-danger">Alle löschen</button>
-        <button id="editor-export-btn" class="btn btn-primary">💾 Als JSON exportieren</button>
         <label class="btn" style="cursor:pointer;">
           📂 JSON / MIDI laden
           <input type="file" id="editor-file-input" accept=".json,.mid,.midi" style="display:none;">
@@ -97,11 +98,44 @@ export class SongEditorMode {
       }
     });
 
+    const saveBtn = this.containerEl.querySelector('#editor-save-btn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => this.saveSongToList());
+    }
+
     const exportBtn = this.containerEl.querySelector('#editor-export-btn');
     exportBtn.addEventListener('click', () => this.exportSongJSON());
 
     const fileInput = this.containerEl.querySelector('#editor-file-input');
     fileInput.addEventListener('change', (e) => this.handleFileImport(e));
+  }
+
+  saveSongToList() {
+    if (this.notes.length === 0) {
+      alert("Füge zuerst ein paar Noten hinzu!");
+      return;
+    }
+
+    const songData = {
+      id: "custom_" + Date.now(),
+      title: this.songTitle || "Mein Stück",
+      artist: this.songArtist || "Ich",
+      category: "Meine Lieder",
+      bpm: this.songBpm || 100,
+      timeSignature: [4, 4],
+      description: "Erstellt mit dem integrierten Gitarren-Song-Editor",
+      notes: this.notes.map(n => ({
+        midi: n.midi,
+        duration: n.duration,
+        ...(n.string !== undefined && n.string !== null ? { string: n.string } : {}),
+        ...(n.fret !== undefined && n.fret !== null ? { fret: n.fret } : {})
+      }))
+    };
+
+    if (this.onSongSaved) {
+      this.onSongSaved(new Song(songData));
+      alert(`Lied "${songData.title}" wurde dauerhaft in deiner Liederliste gespeichert!`);
+    }
   }
 
   show() {
