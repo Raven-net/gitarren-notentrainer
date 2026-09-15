@@ -181,10 +181,8 @@ export class SongEditorMode {
       targetIdx = this.notes.length - 1;
     }
 
-    let noteX = hitLineX;
-    for (let i = 0; i < targetIdx; i++) {
-      noteX += (this.notes[i].duration || 1) * spacing;
-    }
+    const targetNote = this.notes[targetIdx];
+    const noteX = hitLineX + (targetNote.beat !== undefined ? targetNote.beat : targetIdx) * spacing;
 
     const margin = 140;
     const currentViewX = noteX - this.targetScroll;
@@ -197,7 +195,15 @@ export class SongEditorMode {
   }
 
   addNote(midi, string = null, fret = null) {
-    const note = createNote(midi, this.currentDuration, string, fret);
+    let nextBeat = 0;
+    if (this.notes.length > 0) {
+      const last = this.notes[this.notes.length - 1];
+      nextBeat = (last.beat !== undefined ? last.beat : 0) + (last.duration || 1);
+    }
+    const note = {
+      ...createNote(midi, this.currentDuration, string, fret),
+      beat: nextBeat
+    };
     this.notes.push(note);
     this.selectedIndex = this.notes.length - 1;
     this.synth.playGuitarNote(midi, 0.4);
@@ -334,8 +340,9 @@ export class SongEditorMode {
       bpm: this.songBpm || 100,
       timeSignature: [4, 4],
       description: "Erstellt mit dem integrierten Gitarren-Song-Editor",
-      notes: this.notes.map(n => ({
+      notes: this.notes.map((n, idx) => ({
         midi: n.midi,
+        beat: n.beat !== undefined ? n.beat : idx,
         duration: n.duration,
         ...(n.string !== undefined && n.string !== null ? { string: n.string } : {}),
         ...(n.fret !== undefined && n.fret !== null ? { fret: n.fret } : {})
@@ -403,7 +410,17 @@ export class SongEditorMode {
     const bpmInput = this.containerEl.querySelector('#editor-bpm');
     if (bpmInput) bpmInput.value = this.songBpm;
 
-    this.notes = (data.notes || []).map(n => createNote(n.midi, n.duration || 1, n.string, n.fret));
+    let runningBeat = 0;
+    this.notes = (data.notes || []).map((n, idx) => {
+      const beat = (n.beat !== undefined && n.beat !== null) ? Number(n.beat) : runningBeat;
+      const dur = n.duration !== undefined ? Number(n.duration) : 1;
+      if (n.beat === undefined || n.beat === null) runningBeat += dur;
+      return {
+        ...createNote(n.midi, dur, n.string, n.fret),
+        beat: beat,
+        id: idx
+      };
+    });
     this.selectedIndex = this.notes.length - 1;
     this.renderTimeline();
     this.scrollToActiveNote();
@@ -421,12 +438,21 @@ export class SongEditorMode {
     const hitLineX = this.staffRenderer.hitLineX;
     const width = this.staffRenderer.width || 940;
 
-    let currentPos = 0;
-    let measureBeats = 0;
+    const totalBeats = this.notes.reduce((max, n) => Math.max(max, (n.beat || 0) + (n.duration || 1)), 0);
 
+    // 1. Taktstriche an festen Taktgrenzen zeichnen
+    for (let b = 0; b <= totalBeats + 4; b += 4) {
+      const barLineX = hitLineX + (b * spacing) - this.scrollOffset;
+      if (barLineX >= 80 && barLineX <= width + 20) {
+        this.staffRenderer.drawBarLine(barLineX);
+      }
+    }
+
+    // 2. Notenköpfe zeichnen
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
-      const noteX = hitLineX + currentPos - this.scrollOffset;
+      const noteBeat = note.beat !== undefined ? note.beat : i;
+      const noteX = hitLineX + (noteBeat * spacing) - this.scrollOffset;
 
       // Nur zeichnen, wenn im sichtbaren Canvas-Bereich
       if (noteX >= 40 && noteX <= width + 40) {
@@ -441,18 +467,6 @@ export class SongEditorMode {
           isSelected ? 'target' : 'normal',
           accidental
         );
-      }
-
-      currentPos += (note.duration || 1) * spacing;
-      measureBeats += (note.duration || 1);
-
-      // Taktstriche zeichnen
-      if (measureBeats >= 4) {
-        const barLineX = hitLineX + currentPos - this.scrollOffset - (spacing * 0.35);
-        if (barLineX >= 80 && barLineX <= width + 20) {
-          this.staffRenderer.drawBarLine(barLineX);
-        }
-        measureBeats = 0;
       }
     }
   }

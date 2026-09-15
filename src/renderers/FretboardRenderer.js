@@ -102,16 +102,22 @@ export class FretboardRenderer {
     setTimeout(() => btn.classList.remove(className), durationMs);
   }
 
-  setTargetHint(targetMidi) {
-    if (this.lastHintMidi === targetMidi) return;
-    this.lastHintMidi = targetMidi;
+  setTargetHint(targetMidis) {
+    const midiList = Array.isArray(targetMidis)
+      ? targetMidis.filter(m => m !== null && m !== undefined)
+      : (targetMidis !== null && targetMidis !== undefined ? [targetMidis] : []);
+
+    const keySig = midiList.slice().sort().join(',');
+    if (this.lastHintKey === keySig) return;
+    this.lastHintKey = keySig;
 
     let scrollToEl = null;
     for (let s = 0; s < STRINGS.length; s++) {
       for (let f = 0; f <= this.maxFrets; f++) {
         const target = this.targetElements[`${s}-${f}`];
         if (!target) continue;
-        if (targetMidi !== null && STRINGS[s].baseMidi + f === targetMidi) {
+        const currentMidi = STRINGS[s].baseMidi + f;
+        if (midiList.includes(currentMidi)) {
           target.classList.add('target-hint');
           if (!scrollToEl && f > 4) {
             scrollToEl = target;
@@ -129,7 +135,7 @@ export class FretboardRenderer {
       if (targetLeft > card.scrollLeft + card.clientWidth - 100 || targetLeft < card.scrollLeft) {
         card.scrollTo({ left: Math.max(0, targetLeft - 180), behavior: 'smooth' });
       }
-    } else if (targetMidi !== null && this.container.parentElement) {
+    } else if (midiList.length > 0 && this.container.parentElement) {
       const card = this.container.parentElement;
       if (card.scrollLeft > 200) {
         card.scrollTo({ left: 0, behavior: 'smooth' });
@@ -138,7 +144,7 @@ export class FretboardRenderer {
   }
 
   clearHints() {
-    this.lastHintMidi = null;
-    this.setTargetHint(null);
+    this.lastHintKey = null;
+    this.setTargetHint([]);
   }
 }

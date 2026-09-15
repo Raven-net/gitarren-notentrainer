@@ -18,8 +18,19 @@ export class PracticeMode {
     this.currentSong = song;
     this.currentIndex = 0;
     this.scrollOffset = 0;
+    if (this.currentSong) {
+      this.currentSong.notes.forEach(n => { n.isHit = false; });
+    }
     this.updateHints();
     this.notifyProgress();
+  }
+
+  getCurrentChordNotes() {
+    if (!this.currentSong || this.currentIndex >= this.currentSong.notes.length) return [];
+    const currentBeat = this.currentSong.notes[this.currentIndex].beat;
+    return this.currentSong.notes.filter(
+      n => Math.abs(n.beat - currentBeat) < 0.05 && !n.isHit
+    );
   }
 
   updateHints() {
@@ -27,9 +38,9 @@ export class PracticeMode {
       this.fretboardRenderer.clearHints();
       return;
     }
-    const currentNote = this.currentSong.notes[this.currentIndex];
-    if (this.showHints) {
-      this.fretboardRenderer.setTargetHint(currentNote.midi);
+    const currentChord = this.getCurrentChordNotes();
+    if (this.showHints && currentChord.length > 0) {
+      this.fretboardRenderer.setTargetHint(currentChord.map(n => n.midi));
     } else {
       this.fretboardRenderer.clearHints();
     }
@@ -48,14 +59,26 @@ export class PracticeMode {
   evaluateNote(playedMidi, btnElement = null) {
     if (!this.currentSong || this.currentIndex >= this.currentSong.notes.length) return;
 
-    const targetNote = this.currentSong.notes[this.currentIndex];
+    // Prüfen, ob der gespielte Ton zur aktuellen Zählzeit (Gruppe / Akkord) gehört
+    const currentBeat = this.currentSong.notes[this.currentIndex].beat;
+    const match = this.currentSong.notes.find(
+      n => Math.abs(n.beat - currentBeat) < 0.05 && !n.isHit && n.midi === playedMidi
+    );
 
-    if (playedMidi === targetNote.midi) {
-      // Treffer!
-      this.synth.playTone(targetNote.freq, true);
+    if (match) {
+      // Treffer! Kurzer Ton wie bisher (kein Dauerton)
+      match.isHit = true;
+      this.synth.playTone(match.freq, true);
       this.fretboardRenderer.highlightMidi(playedMidi, 'correct-flash');
 
-      this.currentIndex++;
+      // Vorrücken, bis alle getroffenen Noten übersprungen sind
+      while (
+        this.currentIndex < this.currentSong.notes.length &&
+        this.currentSong.notes[this.currentIndex].isHit
+      ) {
+        this.currentIndex++;
+      }
+
       this.updateHints();
       this.notifyProgress();
 
@@ -84,13 +107,14 @@ export class PracticeMode {
   update(dt) {
     if (!this.currentSong) return;
 
-    // Zielposition berechnen
+    // Zielposition weich anhand des aktuellen Beats anfahren
     let targetScroll = 0;
-    for (let i = 0; i < this.currentIndex; i++) {
-      targetScroll += (this.currentSong.notes[i].duration || 1) * this.noteSpacingUnit;
+    if (this.currentIndex < this.currentSong.notes.length) {
+      targetScroll = (this.currentSong.notes[this.currentIndex].beat || 0) * this.noteSpacingUnit;
+    } else {
+      targetScroll = this.currentSong.getTotalBeats() * this.noteSpacingUnit;
     }
 
-    // Weiche Kamera-Interpolation
     this.scrollOffset += (targetScroll - this.scrollOffset) * Math.min(dt * 10, 1);
   }
 
@@ -98,32 +122,34 @@ export class PracticeMode {
     this.staffRenderer.drawStaff();
     if (!this.currentSong) return;
 
-    let currentPos = 0;
-    let measureBeats = 0;
+    const totalBeats = this.currentSong.getTotalBeats();
+    const currentBeat = this.currentIndex < this.currentSong.notes.length
+      ? this.currentSong.notes[this.currentIndex].beat
+      : -1;
 
+    // 1. Taktstriche an festen Taktgrenzen zeichnen (alle 4 Zählzeiten)
+    for (let b = 0; b <= totalBeats + 4; b += 4) {
+      const barLineX = this.hitLineX + (b * this.noteSpacingUnit) - this.scrollOffset;
+      this.staffRenderer.drawBarLine(barLineX);
+    }
+
+    // 2. Notenköpfe zeichnen
     for (let i = 0; i < this.currentSong.notes.length; i++) {
       const note = this.currentSong.notes[i];
-      const noteX = this.hitLineX + (currentPos - this.scrollOffset);
+      const noteX = this.hitLineX + (note.beat * this.noteSpacingUnit) - this.scrollOffset;
 
       if (noteX >= 40 && noteX <= this.staffRenderer.width + 40) {
         let status = 'normal';
-        if (i < this.currentIndex) status = 'hit';
-        else if (i === this.currentIndex) status = 'target';
+        if (note.isHit) {
+          status = 'hit';
+        } else if (Math.abs(note.beat - currentBeat) < 0.05) {
+          status = 'target';
+        }
 
-        // G# Erkennung (z.B. Bund 1 G-Saite oder Bund 4 D-Saite)
         const isSharp = [1, 3, 6, 8, 10].includes(note.midi % 12);
         const accidental = isSharp ? '♯' : null;
 
         this.staffRenderer.drawNote(noteX, note.diatonicStep, note.duration, status, accidental);
-      }
-
-      currentPos += (note.duration || 1) * this.noteSpacingUnit;
-      measureBeats += (note.duration || 1);
-
-      if (measureBeats >= 4) {
-        const barLineX = this.hitLineX + (currentPos - this.scrollOffset) - (this.noteSpacingUnit * 0.35);
-        this.staffRenderer.drawBarLine(barLineX);
-        measureBeats = 0;
       }
     }
   }

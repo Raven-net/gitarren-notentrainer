@@ -135,22 +135,64 @@ export class MidiImporter {
     }
 
     // Nach Start-Tick sortieren
-    allNotes.sort((a, b) => a.startTick - b.startTick);
+    allNotes.sort((a, b) => a.startTick - b.startTick || a.midi - b.midi);
 
-    // In Viertelnoten-Dauern quantisieren
-    const quantizedNotes = allNotes.map(n => {
-      const quarterUnits = n.durationTicks / ticksPerQuarter;
-      let dur = 1;
-      if (quarterUnits >= 3.2) dur = 4;
-      else if (quarterUnits >= 1.6) dur = 2;
-      else if (quarterUnits >= 0.75) dur = 1;
-      else dur = 0.5;
+    // Intelligente Quantisierung auf musikalische Zählzeiten (Viertel, Achtel, 16tel, Triolen, Swing)
+    function quantizeBeat(rawBeat) {
+      const intBeat = Math.floor(rawBeat);
+      const frac = rawBeat - intBeat;
+      const subdivisions = [0.0, 0.25, 1 / 3, 0.5, 0.625, 2 / 3, 0.75, 1.0];
 
-      return {
-        midi: n.midi,
-        duration: dur
-      };
-    });
+      let closest = subdivisions[0];
+      let minDiff = Infinity;
+      for (const s of subdivisions) {
+        const diff = Math.abs(frac - s);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = s;
+        }
+      }
+
+      if (minDiff < 0.13) {
+        return Math.round((intBeat + closest) * 1000) / 1000;
+      }
+      return Math.round(rawBeat * 100) / 100;
+    }
+
+    function quantizeDuration(rawDur) {
+      if (rawDur >= 3.2) return 4;
+      if (rawDur >= 1.6) return 2;
+      if (rawDur >= 0.75) return 1;
+      return 0.5;
+    }
+
+    // Noten aufbereiten und Duplikate auf gleicher Zählzeit filtern
+    const noteMap = new Map(); // key -> { midi, beat, duration }
+
+    for (const n of allNotes) {
+      const rawBeat = n.startTick / ticksPerQuarter;
+      const rawDur = n.durationTicks / ticksPerQuarter;
+      const beat = quantizeBeat(rawBeat);
+      const dur = quantizeDuration(rawDur);
+
+      const key = `${beat}_${n.midi}`;
+      if (noteMap.has(key)) {
+        // Bei Mehrfach-Events auf gleichem Beat die längere Dauer behalten
+        const existing = noteMap.get(key);
+        if (dur > existing.duration) {
+          existing.duration = dur;
+        }
+      } else {
+        noteMap.set(key, {
+          midi: n.midi,
+          beat: beat,
+          duration: dur
+        });
+      }
+    }
+
+    const quantizedNotes = Array.from(noteMap.values());
+    quantizedNotes.sort((a, b) => a.beat - b.beat || a.midi - b.midi);
 
     // Titel aus Dateiname ableiten
     const rawTitle = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
@@ -163,7 +205,7 @@ export class MidiImporter {
       bpm: detectedBpm || 120,
       timeSignature: [4, 4],
       description: "Importiert aus Datei " + file.name,
-      notes: quantizedNotes.slice(0, 120) // Auf 120 Noten begrenzen
+      notes: quantizedNotes.slice(0, 250) // Ausreichend für vollständige Stücke
     };
   }
 }

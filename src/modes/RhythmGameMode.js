@@ -52,11 +52,9 @@ export class RhythmGameMode {
     }
 
     const secondsPerBeat = 60 / this.bpm;
-    let accumulatedBeats = 0;
 
     this.notesState = this.currentSong.notes.map((n, idx) => {
-      const noteStartTime = accumulatedBeats * secondsPerBeat;
-      accumulatedBeats += (n.duration || 1);
+      const noteStartTime = (n.beat !== undefined ? n.beat : 0) * secondsPerBeat;
       return {
         id: idx,
         note: n,
@@ -68,7 +66,9 @@ export class RhythmGameMode {
 
     this.songTime = 0;
     if (this.notesState.length > 0) {
-      this.fretboardRenderer.setTargetHint(this.notesState[0].note.midi);
+      const firstTarget = this.notesState[0].targetTime;
+      const firstGroup = this.notesState.filter(n => Math.abs(n.targetTime - firstTarget) < 0.05);
+      this.fretboardRenderer.setTargetHint(firstGroup.map(g => g.note.midi));
     }
   }
 
@@ -200,12 +200,22 @@ export class RhythmGameMode {
       }
     }
 
-    // Nächste erwartete Note auf Griffbrett anzeigen
-    const upcoming = this.notesState.find(n => n.state === 'pending' && n.targetTime - this.songTime > -0.1);
-    if (upcoming) {
-      this.fretboardRenderer.setTargetHint(upcoming.note.midi);
+    // Nächste erwartete Note(n) auf Griffbrett anzeigen (auch Akkorde/Mehrklänge)
+    const upcomingActive = this.notesState.filter(
+      n => n.state === 'pending' && Math.abs(n.targetTime - this.songTime) <= this.hitWindowSeconds + 0.05
+    );
+    if (upcomingActive.length > 0) {
+      this.fretboardRenderer.setTargetHint(upcomingActive.map(u => u.note.midi));
     } else {
-      this.fretboardRenderer.clearHints();
+      const nextOne = this.notesState.find(n => n.state === 'pending' && n.targetTime - this.songTime > -0.1);
+      if (nextOne) {
+        const chord = this.notesState.filter(
+          n => n.state === 'pending' && Math.abs(n.targetTime - nextOne.targetTime) < 0.05
+        );
+        this.fretboardRenderer.setTargetHint(chord.map(c => c.note.midi));
+      } else {
+        this.fretboardRenderer.clearHints();
+      }
     }
 
     // Prüfen, ob das Lied zu Ende ist

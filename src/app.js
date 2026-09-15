@@ -15,7 +15,8 @@ class GuitarApp {
   constructor() {
     this.songs = [...BUILTIN_SONGS.map(s => new Song(s))];
     this.loadCustomSongsFromStorage();
-    this.currentSong = this.songs[0];
+    const gia = this.songs.find(s => s.id === 'guitar_in_action');
+    this.currentSong = gia || this.songs[0];
     this.currentModeName = 'practice'; // 'practice' | 'rhythm' | 'endless' | 'editor'
 
     // DOM-Elemente
@@ -227,7 +228,15 @@ class GuitarApp {
     try {
       const saved = localStorage.getItem('custom_guitar_songs');
       if (saved) {
-        const list = JSON.parse(saved);
+        let list = JSON.parse(saved);
+        // Falls in localStorage noch eine alte, fehlerhafte Version von Guitar in Action liegt,
+        // filtern wir diese heraus, damit das saubere, eingespielte Builtin-Lied verwendet wird
+        list = list.filter(songData => {
+          const t = (songData.title || '').toLowerCase();
+          return !t.includes('guitar in action') && !t.includes('guitar-in-action');
+        });
+        localStorage.setItem('custom_guitar_songs', JSON.stringify(list));
+
         list.forEach(songData => {
           if (!this.songs.some(s => s.id === songData.id)) {
             this.songs.push(new Song(songData));
