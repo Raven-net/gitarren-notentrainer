@@ -32,6 +32,7 @@ class GuitarApp {
     this.bpmSlider = document.getElementById('bpm-slider');
     this.bpmValDisplay = document.getElementById('bpm-val');
     this.metronomeToggle = document.getElementById('metronome-toggle');
+    this.rhythmStartBtn = document.getElementById('rhythm-start-btn');
 
     this.scoreDisplay = document.getElementById('score');
     this.pitchDisplay = document.getElementById('pitch-display');
@@ -73,7 +74,10 @@ class GuitarApp {
       fretboardRenderer: this.fretboardRenderer,
       synth: this.synth,
       onProgressUpdate: (p) => { this.scoreDisplay.innerText = p.scoreText; },
-      onComplete: (res) => this.showEvaluationModal(res)
+      onComplete: (res) => {
+        this.updateRhythmButtonState(false);
+        this.showEvaluationModal(res);
+      }
     });
 
     this.endlessMode = new EndlessMode({
@@ -130,12 +134,31 @@ class GuitarApp {
       this.rhythmMode.setMetronome(e.target.checked);
     });
 
+    if (this.rhythmStartBtn) {
+      this.rhythmStartBtn.addEventListener('click', () => {
+        this.toggleRhythmPlayback();
+      });
+    }
+
+    // Leertaste zum Starten/Stoppen im Rhythmus-Modus
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && this.currentModeName === 'rhythm') {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+          e.preventDefault();
+          this.toggleRhythmPlayback();
+        }
+      }
+    });
+
     this.irigBtn.addEventListener('click', () => this.connectAudio('irig'));
     this.micBtn.addEventListener('click', () => this.connectAudio('mic'));
 
     this.modalRestartBtn.addEventListener('click', () => {
       this.hideEvaluationModal();
       this.loadCurrentSongIntoMode();
+      if (this.currentModeName === 'rhythm') {
+        this.toggleRhythmPlayback();
+      }
     });
 
     this.modalCloseBtn.addEventListener('click', () => {
@@ -186,6 +209,7 @@ class GuitarApp {
   setMode(mode) {
     this.currentModeName = mode;
     this.rhythmMode.stop();
+    this.updateRhythmButtonState(false);
     this.editorMode.hide();
 
     // Sichtbarkeit der Steuerelemente steuern
@@ -203,11 +227,28 @@ class GuitarApp {
     }
   }
 
+  toggleRhythmPlayback() {
+    const isPlaying = this.rhythmMode.togglePlay();
+    this.updateRhythmButtonState(isPlaying);
+  }
+
+  updateRhythmButtonState(isPlaying) {
+    if (!this.rhythmStartBtn) return;
+    if (isPlaying) {
+      this.rhythmStartBtn.innerText = "⏹ Stopp";
+      this.rhythmStartBtn.className = "btn btn-danger";
+    } else {
+      this.rhythmStartBtn.innerText = "▶ Start";
+      this.rhythmStartBtn.className = "btn btn-success";
+    }
+  }
+
   loadCurrentSongIntoMode() {
     if (!this.currentSong) return;
     if (this.currentModeName === 'practice') {
       this.practiceMode.loadSong(this.currentSong);
     } else if (this.currentModeName === 'rhythm') {
+      this.updateRhythmButtonState(false);
       const bpm = parseInt(this.bpmSlider.value) || this.currentSong.bpm || 100;
       this.rhythmMode.loadSong(this.currentSong, bpm);
     }

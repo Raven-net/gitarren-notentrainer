@@ -28,6 +28,9 @@ export class RhythmGameMode {
 
   setBpm(bpm) {
     this.bpm = bpm;
+    if (!this.isPlaying && this.currentSong) {
+      this.prepareTimeline();
+    }
   }
 
   setMetronome(enabled) {
@@ -37,24 +40,17 @@ export class RhythmGameMode {
   loadSong(song, customBpm = null) {
     this.currentSong = song;
     this.bpm = customBpm || song.bpm || 100;
-    this.reset();
+    this.stop();
+    this.prepareTimeline();
+    this.notifyProgress("Bereit – Klicke auf Start");
   }
 
-  reset() {
-    this.songTime = -this.startDelay;
-    this.isPlaying = true;
-    this.hits = 0;
-    this.misses = 0;
-    this.streak = 0;
-    this.maxStreak = 0;
-    this.lastBeatNumber = -1;
-
+  prepareTimeline() {
     if (!this.currentSong) {
       this.notesState = [];
       return;
     }
 
-    // Noten auf Zeitachse abbilden
     const secondsPerBeat = 60 / this.bpm;
     let accumulatedBeats = 0;
 
@@ -66,19 +62,49 @@ export class RhythmGameMode {
         note: n,
         targetTime: noteStartTime,
         durationSeconds: (n.duration || 1) * secondsPerBeat,
-        state: 'pending' // 'pending' | 'hit' | 'miss'
+        state: 'pending'
       };
     });
 
+    this.songTime = 0;
+    if (this.notesState.length > 0) {
+      this.fretboardRenderer.setTargetHint(this.notesState[0].note.midi);
+    }
+  }
+
+  start() {
+    if (!this.currentSong) return;
+    this.prepareTimeline();
+    this.songTime = -this.startDelay;
+    this.isPlaying = true;
+    this.hits = 0;
+    this.misses = 0;
+    this.streak = 0;
+    this.maxStreak = 0;
+    this.lastBeatNumber = -1;
     this.notifyProgress();
   }
 
   stop() {
     this.isPlaying = false;
+    this.songTime = 0;
     this.fretboardRenderer.clearHints();
+    if (this.notesState) {
+      this.notesState.forEach(n => { n.state = 'pending'; });
+    }
+    this.notifyProgress("Gestoppt – Klicke auf Start");
   }
 
-  notifyProgress() {
+  togglePlay() {
+    if (this.isPlaying) {
+      this.stop();
+    } else {
+      this.start();
+    }
+    return this.isPlaying;
+  }
+
+  notifyProgress(customText = null) {
     if (this.onProgressUpdate && this.notesState.length > 0) {
       const total = this.notesState.length;
       const completed = this.hits + this.misses;
@@ -89,7 +115,7 @@ export class RhythmGameMode {
         total: total,
         streak: this.streak,
         accuracy: accuracy,
-        scoreText: `Hits: ${this.hits}/${total} (${accuracy}%)`
+        scoreText: customText || `Hits: ${this.hits}/${total} (${accuracy}%)`
       });
     }
   }
@@ -238,13 +264,20 @@ export class RhythmGameMode {
     }
 
     // Einzähler-Hinweis auf Canvas anzeigen, wenn im Vorlauf
-    if (this.songTime < 0) {
+    if (this.isPlaying && this.songTime < 0) {
       const count = Math.ceil(-this.songTime);
       this.staffRenderer.ctx.save();
       this.staffRenderer.ctx.fillStyle = 'rgba(234, 88, 12, 0.9)';
       this.staffRenderer.ctx.font = 'bold 36px system-ui, sans-serif';
       this.staffRenderer.ctx.textAlign = 'center';
       this.staffRenderer.ctx.fillText(`Start in: ${count}`, this.staffRenderer.width / 2, 50);
+      this.staffRenderer.ctx.restore();
+    } else if (!this.isPlaying) {
+      this.staffRenderer.ctx.save();
+      this.staffRenderer.ctx.fillStyle = 'rgba(59, 130, 246, 0.85)';
+      this.staffRenderer.ctx.font = 'bold 20px system-ui, sans-serif';
+      this.staffRenderer.ctx.textAlign = 'center';
+      this.staffRenderer.ctx.fillText('▶ Klicke auf "Start" (oder Leertaste)', this.staffRenderer.width / 2, 45);
       this.staffRenderer.ctx.restore();
     }
   }
