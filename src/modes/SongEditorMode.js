@@ -20,6 +20,9 @@ export class SongEditorMode {
     this.previewIndex = 0;
     this.previewTimer = null;
 
+    this.scrollOffset = 0;
+    this.targetScroll = 0;
+
     this.setupUI();
   }
 
@@ -140,32 +143,85 @@ export class SongEditorMode {
 
   show() {
     if (this.containerEl) this.containerEl.style.display = 'flex';
+    this.scrollToActiveNote();
+    if (!this.boundWheelHandler && this.staffRenderer.canvas) {
+      this.boundWheelHandler = (e) => this.handleWheel(e);
+      this.staffRenderer.canvas.addEventListener('wheel', this.boundWheelHandler, { passive: false });
+    }
   }
 
   hide() {
     if (this.containerEl) this.containerEl.style.display = 'none';
     this.stopPlayback();
+    if (this.boundWheelHandler && this.staffRenderer.canvas) {
+      this.staffRenderer.canvas.removeEventListener('wheel', this.boundWheelHandler);
+      this.boundWheelHandler = null;
+    }
+  }
+
+  handleWheel(e) {
+    e.preventDefault();
+    const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+    this.targetScroll = Math.max(0, this.targetScroll + delta * 0.75);
+  }
+
+  scrollToActiveNote() {
+    if (this.notes.length === 0) {
+      this.targetScroll = 0;
+      return;
+    }
+
+    const spacing = this.staffRenderer.noteSpacingUnit;
+    const hitLineX = this.staffRenderer.hitLineX;
+    const canvasWidth = this.staffRenderer.width || 940;
+
+    let targetIdx = this.selectedIndex;
+    if (targetIdx < 0 || targetIdx >= this.notes.length) {
+      targetIdx = this.notes.length - 1;
+    }
+
+    let noteX = hitLineX;
+    for (let i = 0; i < targetIdx; i++) {
+      noteX += (this.notes[i].duration || 1) * spacing;
+    }
+
+    const margin = 140;
+    const currentViewX = noteX - this.targetScroll;
+
+    if (currentViewX > canvasWidth - margin) {
+      this.targetScroll = noteX - (canvasWidth - margin);
+    } else if (currentViewX < hitLineX) {
+      this.targetScroll = Math.max(0, noteX - hitLineX);
+    }
   }
 
   addNote(midi, string = null, fret = null) {
     const note = createNote(midi, this.currentDuration, string, fret);
     this.notes.push(note);
+    this.selectedIndex = this.notes.length - 1;
     this.synth.playGuitarNote(midi, 0.4);
     this.fretboardRenderer.highlightMidi(midi, 'correct-flash');
     this.renderTimeline();
+    this.scrollToActiveNote();
   }
 
   removeLastNote() {
     if (this.notes.length > 0) {
       this.notes.pop();
+      this.selectedIndex = this.notes.length - 1;
       this.renderTimeline();
+      this.scrollToActiveNote();
     }
   }
 
   removeNoteAt(index) {
     if (index >= 0 && index < this.notes.length) {
       this.notes.splice(index, 1);
+      if (this.selectedIndex >= this.notes.length) {
+        this.selectedIndex = this.notes.length - 1;
+      }
       this.renderTimeline();
+      this.scrollToActiveNote();
     }
   }
 
@@ -198,6 +254,7 @@ export class SongEditorMode {
           this.selectedIndex = idx;
           this.synth.playGuitarNote(note.midi, 0.4);
           this.renderTimeline();
+          this.scrollToActiveNote();
         }
       });
 
@@ -235,6 +292,7 @@ export class SongEditorMode {
     const note = this.notes[this.previewIndex];
     this.selectedIndex = this.previewIndex;
     this.renderTimeline();
+    this.scrollToActiveNote();
 
     const secondsPerBeat = 60 / this.songBpm;
     const durSeconds = note.duration * secondsPerBeat;
@@ -256,8 +314,9 @@ export class SongEditorMode {
     }
     const playBtn = this.containerEl.querySelector('#editor-play-btn');
     if (playBtn) playBtn.innerText = "▶ Playback";
-    this.selectedIndex = -1;
+    this.selectedIndex = this.notes.length - 1;
     this.renderTimeline();
+    this.scrollToActiveNote();
   }
 
   exportSongJSON() {
@@ -332,42 +391,54 @@ export class SongEditorMode {
     if (bpmInput) bpmInput.value = this.songBpm;
 
     this.notes = (data.notes || []).map(n => createNote(n.midi, n.duration || 1, n.string, n.fret));
+    this.selectedIndex = this.notes.length - 1;
     this.renderTimeline();
+    this.scrollToActiveNote();
   }
 
   update(dt) {
-    // Editor benötigt keine permanente Animation
+    // Sanftes Nachführen des Notenbands im Editor
+    this.scrollOffset += (this.targetScroll - this.scrollOffset) * Math.min(dt * 12, 1);
   }
 
   render() {
     this.staffRenderer.drawStaff();
 
-    // Noten aus dem Editor auf dem Notensystem anzeigen
     const spacing = this.staffRenderer.noteSpacingUnit;
-    let currentX = this.staffRenderer.hitLineX;
+    const hitLineX = this.staffRenderer.hitLineX;
+    const width = this.staffRenderer.width || 940;
+
+    let currentPos = 0;
     let measureBeats = 0;
 
     for (let i = 0; i < this.notes.length; i++) {
       const note = this.notes[i];
-      if (currentX > this.staffRenderer.width - 20) break;
+      const noteX = hitLineX + currentPos - this.scrollOffset;
 
-      const isSelected = i === this.selectedIndex;
-      const isSharp = [1, 3, 6, 8, 10].includes(note.midi % 12);
-      const accidental = isSharp ? '♯' : null;
+      // Nur zeichnen, wenn im sichtbaren Canvas-Bereich
+      if (noteX >= 40 && noteX <= width + 40) {
+        const isSelected = (i === this.selectedIndex);
+        const isSharp = [1, 3, 6, 8, 10].includes(note.midi % 12);
+        const accidental = isSharp ? '♯' : null;
 
-      this.staffRenderer.drawNote(
-        currentX,
-        note.diatonicStep,
-        note.duration,
-        isSelected ? 'target' : 'normal',
-        accidental
-      );
+        this.staffRenderer.drawNote(
+          noteX,
+          note.diatonicStep,
+          note.duration,
+          isSelected ? 'target' : 'normal',
+          accidental
+        );
+      }
 
-      currentX += note.duration * spacing;
-      measureBeats += note.duration;
+      currentPos += (note.duration || 1) * spacing;
+      measureBeats += (note.duration || 1);
 
+      // Taktstriche zeichnen
       if (measureBeats >= 4) {
-        this.staffRenderer.drawBarLine(currentX - (spacing * 0.35));
+        const barLineX = hitLineX + currentPos - this.scrollOffset - (spacing * 0.35);
+        if (barLineX >= 80 && barLineX <= width + 20) {
+          this.staffRenderer.drawBarLine(barLineX);
+        }
         measureBeats = 0;
       }
     }
