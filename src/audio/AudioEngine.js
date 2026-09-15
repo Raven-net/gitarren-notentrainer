@@ -49,7 +49,7 @@ export class AudioEngine {
 
       const lowPass = this.audioCtx.createBiquadFilter();
       lowPass.type = "lowpass";
-      lowPass.frequency.setValueAtTime(750, this.audioCtx.currentTime);
+      lowPass.frequency.setValueAtTime(1200, this.audioCtx.currentTime);
 
       this.sourceNode.connect(highPass);
       highPass.connect(lowPass);

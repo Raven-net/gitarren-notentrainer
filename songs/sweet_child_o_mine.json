@@ -1,0 +1,46 @@
+{
+  "id": "sweet_child",
+  "title": "Sweet Child O' Mine",
+  "artist": "Guns N' Roses",
+  "category": "Rock",
+  "bpm": 125,
+  "timeSignature": [4, 4],
+  "description": "Das legendäre Intro-Lick von Slash (Bund 12 bis 15)",
+  "notes": [
+    { "midi": 62, "duration": 0.5, "string": 3, "fret": 12 },
+    { "midi": 74, "duration": 0.5, "string": 1, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 67, "duration": 0.5, "string": 2, "fret": 12 },
+    { "midi": 79, "duration": 0.5, "string": 0, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 78, "duration": 0.5, "string": 0, "fret": 14 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+
+    { "midi": 62, "duration": 0.5, "string": 3, "fret": 12 },
+    { "midi": 74, "duration": 0.5, "string": 1, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 67, "duration": 0.5, "string": 2, "fret": 12 },
+    { "midi": 79, "duration": 0.5, "string": 0, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 78, "duration": 0.5, "string": 0, "fret": 14 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+
+    { "midi": 64, "duration": 0.5, "string": 3, "fret": 14 },
+    { "midi": 74, "duration": 0.5, "string": 1, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 67, "duration": 0.5, "string": 2, "fret": 12 },
+    { "midi": 79, "duration": 0.5, "string": 0, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 78, "duration": 0.5, "string": 0, "fret": 14 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+
+    { "midi": 64, "duration": 0.5, "string": 3, "fret": 14 },
+    { "midi": 74, "duration": 0.5, "string": 1, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 67, "duration": 0.5, "string": 2, "fret": 12 },
+    { "midi": 79, "duration": 0.5, "string": 0, "fret": 15 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 },
+    { "midi": 78, "duration": 0.5, "string": 0, "fret": 14 },
+    { "midi": 69, "duration": 0.5, "string": 2, "fret": 14 }
+  ]
+}

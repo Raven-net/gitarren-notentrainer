@@ -3,8 +3,8 @@ import { NOTE_NAMES } from '../models/Note.js';
 export class PitchDetector {
   constructor(options = {}) {
     this.rmsThreshold = options.rmsThreshold || 0.015;
-    this.minFreq = options.minFreq || 70;   // Tiefes E Gitarre ist ca. 82.4 Hz
-    this.maxFreq = options.maxFreq || 500;  // Bund 4 auf hoher e-Saite ist ca. 415 Hz
+    this.minFreq = options.minFreq || 70;    // Tiefes E Gitarre ist ca. 82.4 Hz
+    this.maxFreq = options.maxFreq || 1100; // Bis über Bund 15 auf hoher e-Saite (G5 = 784 Hz, C6 = 1046 Hz)
     this.centsTolerance = options.centsTolerance || 42;
     this.requiredStreak = options.requiredStreak || 2;
     this.cooldownMs = options.cooldownMs || 280;

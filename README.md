@@ -40,9 +40,15 @@ Gitarren_Noten_Lernen/
 │   ├── smoke_on_the_water.json
 │   ├── seven_nation_army.json
 │   ├── nothing_else_matters.json
+│   ├── sweet_child_o_mine.json     # Guns N' Roses (Slash Lick, Bund 12-15)
+│   ├── enter_sandman.json          # Metallica (Main Riff, Bund 0-7)
+│   ├── iron_man.json               # Black Sabbath (Heavy Riff, Bund 2-10)
+│   ├── sunshine_of_your_love.json  # Cream / Eric Clapton (Blues-Riff, Bund 5-12)
+│   ├── back_in_black.json          # AC/DC (Chords & Lead-Lick, Bund 0-15)
 │   ├── ode_an_die_freude.json
 │   ├── frere_jacques.json
-│   └── haenschen_klein.json
+│   ├── haenschen_klein.json
+│   └── old_mcdonald.json
 └── src/
     ├── app.js                 # Hauptcontroller & Event-Dispatcher
     ├── audio/

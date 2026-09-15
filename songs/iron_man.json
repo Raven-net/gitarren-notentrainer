@@ -1,0 +1,33 @@
+{
+  "id": "iron_man",
+  "title": "Iron Man",
+  "artist": "Black Sabbath",
+  "category": "Rock",
+  "bpm": 74,
+  "timeSignature": [4, 4],
+  "description": "Tony Iommis Heavy-Metal-Meilenstein entlang der A-Saite (Bund 2 bis 10)",
+  "notes": [
+    { "midi": 47, "duration": 2, "string": 4, "fret": 2 },
+    { "midi": 50, "duration": 1.5, "string": 4, "fret": 5 },
+    { "midi": 50, "duration": 0.5, "string": 4, "fret": 5 },
+    { "midi": 52, "duration": 2, "string": 4, "fret": 7 },
+    { "midi": 52, "duration": 2, "string": 4, "fret": 7 },
+
+    { "midi": 55, "duration": 0.5, "string": 4, "fret": 10 },
+    { "midi": 54, "duration": 0.5, "string": 4, "fret": 9 },
+    { "midi": 55, "duration": 0.5, "string": 4, "fret": 10 },
+    { "midi": 54, "duration": 0.5, "string": 4, "fret": 9 },
+    { "midi": 55, "duration": 1, "string": 4, "fret": 10 },
+    { "midi": 50, "duration": 1, "string": 4, "fret": 5 },
+
+    { "midi": 50, "duration": 1, "string": 4, "fret": 5 },
+    { "midi": 52, "duration": 1.5, "string": 4, "fret": 7 },
+    { "midi": 52, "duration": 1.5, "string": 4, "fret": 7 },
+
+    { "midi": 47, "duration": 2, "string": 4, "fret": 2 },
+    { "midi": 50, "duration": 1.5, "string": 4, "fret": 5 },
+    { "midi": 50, "duration": 0.5, "string": 4, "fret": 5 },
+    { "midi": 52, "duration": 2, "string": 4, "fret": 7 },
+    { "midi": 52, "duration": 2, "string": 4, "fret": 7 }
+  ]
+}

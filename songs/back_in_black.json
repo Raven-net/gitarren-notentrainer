@@ -1,0 +1,34 @@
+{
+  "id": "back_in_black",
+  "title": "Back in Black",
+  "artist": "AC/DC (Angus Young)",
+  "category": "Rock",
+  "bpm": 92,
+  "timeSignature": [4, 4],
+  "description": "Kult-Akkorde, High-Lead-Lick (Bund 12-15) & chromatischer Turnaround",
+  "notes": [
+    { "midi": 40, "duration": 1, "string": 5, "fret": 0 },
+    { "midi": 50, "duration": 1, "string": 3, "fret": 0 },
+    { "midi": 45, "duration": 2, "string": 4, "fret": 0 },
+
+    { "midi": 79, "duration": 0.5, "string": 0, "fret": 15 },
+    { "midi": 76, "duration": 0.5, "string": 0, "fret": 12 },
+    { "midi": 74, "duration": 0.5, "string": 1, "fret": 15 },
+    { "midi": 71, "duration": 0.5, "string": 1, "fret": 12 },
+    { "midi": 69, "duration": 1, "string": 2, "fret": 14 },
+    { "midi": 40, "duration": 1, "string": 5, "fret": 0 },
+
+    { "midi": 40, "duration": 1, "string": 5, "fret": 0 },
+    { "midi": 50, "duration": 1, "string": 3, "fret": 0 },
+    { "midi": 45, "duration": 2, "string": 4, "fret": 0 },
+
+    { "midi": 47, "duration": 0.5, "string": 4, "fret": 2 },
+    { "midi": 49, "duration": 0.5, "string": 4, "fret": 4 },
+    { "midi": 47, "duration": 0.5, "string": 4, "fret": 2 },
+    { "midi": 50, "duration": 0.5, "string": 4, "fret": 5 },
+    { "midi": 47, "duration": 0.5, "string": 4, "fret": 2 },
+    { "midi": 51, "duration": 0.5, "string": 4, "fret": 6 },
+    { "midi": 47, "duration": 0.5, "string": 4, "fret": 2 },
+    { "midi": 52, "duration": 0.5, "string": 4, "fret": 7 }
+  ]
+}

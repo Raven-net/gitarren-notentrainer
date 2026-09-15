@@ -1,0 +1,30 @@
+{
+  "id": "sunshine",
+  "title": "Sunshine of Your Love",
+  "artist": "Cream (Eric Clapton)",
+  "category": "Rock",
+  "bpm": 115,
+  "timeSignature": [4, 4],
+  "description": "Eric Claptons berühmtes D-Blues-Riff (Bund 5 bis 12)",
+  "notes": [
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+    { "midi": 60, "duration": 1, "string": 3, "fret": 10 },
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+
+    { "midi": 56, "duration": 1, "string": 4, "fret": 11 },
+    { "midi": 55, "duration": 1, "string": 4, "fret": 10 },
+    { "midi": 53, "duration": 1, "string": 4, "fret": 8 },
+    { "midi": 50, "duration": 1, "string": 4, "fret": 5 },
+
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+    { "midi": 60, "duration": 1, "string": 3, "fret": 10 },
+    { "midi": 62, "duration": 1, "string": 3, "fret": 12 },
+
+    { "midi": 56, "duration": 1, "string": 4, "fret": 11 },
+    { "midi": 55, "duration": 1, "string": 4, "fret": 10 },
+    { "midi": 53, "duration": 1, "string": 4, "fret": 8 },
+    { "midi": 50, "duration": 1, "string": 4, "fret": 5 }
+  ]
+}

@@ -8,18 +8,19 @@
   box-shadow: var(--shadow-lg), inset 0 0 25px rgba(0, 0, 0, 0.6);
   position: relative;
   overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
 .fretboard {
   display: grid;
-  grid-template-columns: 80px repeat(4, 1fr);
+  grid-template-columns: 62px repeat(15, minmax(58px, 1fr));
   position: relative;
-  min-width: 650px;
+  min-width: 950px;
 }
 
 .fret-header {
   text-align: center;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #c9cdd4;
   padding-bottom: 8px;
@@ -41,25 +42,36 @@
   background: rgba(0, 0, 0, 0.28);
 }
 
-/* Frets 1 to 4 have metal fret wire */
+/* Frets 1 to 15 have metal fret wire */
 .fret-column:not(:first-child) {
-  border-right: 4px solid var(--fret-wire);
+  border-right: 3.5px solid var(--fret-wire);
   box-shadow: 2px 0 3px rgba(0, 0, 0, 0.4);
 }
 
-/* Fret Markers (Dot in Bund 3) */
+/* Fret Markers (Dots in Bünden 3, 5, 7, 9, 12, 15) */
 .fret-marker {
   position: absolute;
-  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: radial-gradient(circle, var(--fret-marker) 50%, #9ca3af 100%);
   border-radius: 50%;
   opacity: 0.55;
   pointer-events: none;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.fret-marker.single {
+  top: 50%;
+}
+
+.fret-marker.double-top {
+  top: 28%;
+}
+
+.fret-marker.double-bottom {
+  top: 72%;
 }
 
 /* Note Targets & Strings */

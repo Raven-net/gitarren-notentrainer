@@ -245,6 +245,183 @@ export const BUILTIN_SONGS = [
       { midi: 59, duration: 1, string: 1, fret: 0 },
       { midi: 57, duration: 1, string: 2, fret: 2 }
     ]
+  },
+  {
+    id: "sweet_child",
+    title: "Sweet Child O' Mine",
+    artist: "Guns N' Roses",
+    category: "Rock",
+    bpm: 125,
+    timeSignature: [4, 4],
+    description: "Das legendäre Intro-Lick von Slash (Bund 12 bis 15)",
+    notes: [
+      { midi: 62, duration: 0.5, string: 3, fret: 12 },
+      { midi: 74, duration: 0.5, string: 1, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 67, duration: 0.5, string: 2, fret: 12 },
+      { midi: 79, duration: 0.5, string: 0, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 78, duration: 0.5, string: 0, fret: 14 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+
+      { midi: 62, duration: 0.5, string: 3, fret: 12 },
+      { midi: 74, duration: 0.5, string: 1, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 67, duration: 0.5, string: 2, fret: 12 },
+      { midi: 79, duration: 0.5, string: 0, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 78, duration: 0.5, string: 0, fret: 14 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+
+      { midi: 64, duration: 0.5, string: 3, fret: 14 },
+      { midi: 74, duration: 0.5, string: 1, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 67, duration: 0.5, string: 2, fret: 12 },
+      { midi: 79, duration: 0.5, string: 0, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 78, duration: 0.5, string: 0, fret: 14 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+
+      { midi: 64, duration: 0.5, string: 3, fret: 14 },
+      { midi: 74, duration: 0.5, string: 1, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 67, duration: 0.5, string: 2, fret: 12 },
+      { midi: 79, duration: 0.5, string: 0, fret: 15 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 },
+      { midi: 78, duration: 0.5, string: 0, fret: 14 },
+      { midi: 69, duration: 0.5, string: 2, fret: 14 }
+    ]
+  },
+  {
+    id: "enter_sandman",
+    title: "Enter Sandman",
+    artist: "Metallica",
+    category: "Rock",
+    bpm: 120,
+    timeSignature: [4, 4],
+    description: "Kult-Metal-Riff mit weiten Griffen (Bund 0 bis 7)",
+    notes: [
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+      { midi: 52, duration: 1, string: 4, fret: 7 },
+      { midi: 55, duration: 1, string: 3, fret: 5 },
+      { midi: 46, duration: 0.5, string: 5, fret: 6 },
+      { midi: 45, duration: 0.5, string: 5, fret: 5 },
+      { midi: 43, duration: 1, string: 5, fret: 3 },
+      { midi: 40, duration: 3, string: 5, fret: 0 },
+
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+      { midi: 52, duration: 1, string: 4, fret: 7 },
+      { midi: 55, duration: 1, string: 3, fret: 5 },
+      { midi: 46, duration: 0.5, string: 5, fret: 6 },
+      { midi: 45, duration: 0.5, string: 5, fret: 5 },
+      { midi: 43, duration: 1, string: 5, fret: 3 },
+      { midi: 40, duration: 3, string: 5, fret: 0 },
+
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+      { midi: 52, duration: 1, string: 4, fret: 7 },
+      { midi: 55, duration: 1, string: 3, fret: 5 },
+      { midi: 46, duration: 0.5, string: 5, fret: 6 },
+      { midi: 45, duration: 0.5, string: 5, fret: 5 },
+      { midi: 43, duration: 1, string: 5, fret: 3 },
+      { midi: 40, duration: 3, string: 5, fret: 0 }
+    ]
+  },
+  {
+    id: "iron_man",
+    title: "Iron Man",
+    artist: "Black Sabbath",
+    category: "Rock",
+    bpm: 74,
+    timeSignature: [4, 4],
+    description: "Tony Iommis Heavy-Metal-Meilenstein entlang der A-Saite (Bund 2 bis 10)",
+    notes: [
+      { midi: 47, duration: 2, string: 4, fret: 2 },
+      { midi: 50, duration: 1.5, string: 4, fret: 5 },
+      { midi: 50, duration: 0.5, string: 4, fret: 5 },
+      { midi: 52, duration: 2, string: 4, fret: 7 },
+      { midi: 52, duration: 2, string: 4, fret: 7 },
+
+      { midi: 55, duration: 0.5, string: 4, fret: 10 },
+      { midi: 54, duration: 0.5, string: 4, fret: 9 },
+      { midi: 55, duration: 0.5, string: 4, fret: 10 },
+      { midi: 54, duration: 0.5, string: 4, fret: 9 },
+      { midi: 55, duration: 1, string: 4, fret: 10 },
+      { midi: 50, duration: 1, string: 4, fret: 5 },
+
+      { midi: 50, duration: 1, string: 4, fret: 5 },
+      { midi: 52, duration: 1.5, string: 4, fret: 7 },
+      { midi: 52, duration: 1.5, string: 4, fret: 7 },
+
+      { midi: 47, duration: 2, string: 4, fret: 2 },
+      { midi: 50, duration: 1.5, string: 4, fret: 5 },
+      { midi: 50, duration: 0.5, string: 4, fret: 5 },
+      { midi: 52, duration: 2, string: 4, fret: 7 },
+      { midi: 52, duration: 2, string: 4, fret: 7 }
+    ]
+  },
+  {
+    id: "sunshine",
+    title: "Sunshine of Your Love",
+    artist: "Cream (Eric Clapton)",
+    category: "Rock",
+    bpm: 115,
+    timeSignature: [4, 4],
+    description: "Eric Claptons berühmtes D-Blues-Riff (Bund 5 bis 12)",
+    notes: [
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+      { midi: 60, duration: 1, string: 3, fret: 10 },
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+
+      { midi: 56, duration: 1, string: 4, fret: 11 },
+      { midi: 55, duration: 1, string: 4, fret: 10 },
+      { midi: 53, duration: 1, string: 4, fret: 8 },
+      { midi: 50, duration: 1, string: 4, fret: 5 },
+
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+      { midi: 60, duration: 1, string: 3, fret: 10 },
+      { midi: 62, duration: 1, string: 3, fret: 12 },
+
+      { midi: 56, duration: 1, string: 4, fret: 11 },
+      { midi: 55, duration: 1, string: 4, fret: 10 },
+      { midi: 53, duration: 1, string: 4, fret: 8 },
+      { midi: 50, duration: 1, string: 4, fret: 5 }
+    ]
+  },
+  {
+    id: "back_in_black",
+    title: "Back in Black",
+    artist: "AC/DC (Angus Young)",
+    category: "Rock",
+    bpm: 92,
+    timeSignature: [4, 4],
+    description: "Kult-Akkorde, High-Lead-Lick (Bund 12-15) & chromatischer Turnaround",
+    notes: [
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+      { midi: 50, duration: 1, string: 3, fret: 0 },
+      { midi: 45, duration: 2, string: 4, fret: 0 },
+
+      { midi: 79, duration: 0.5, string: 0, fret: 15 },
+      { midi: 76, duration: 0.5, string: 0, fret: 12 },
+      { midi: 74, duration: 0.5, string: 1, fret: 15 },
+      { midi: 71, duration: 0.5, string: 1, fret: 12 },
+      { midi: 69, duration: 1, string: 2, fret: 14 },
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+
+      { midi: 40, duration: 1, string: 5, fret: 0 },
+      { midi: 50, duration: 1, string: 3, fret: 0 },
+      { midi: 45, duration: 2, string: 4, fret: 0 },
+
+      { midi: 47, duration: 0.5, string: 4, fret: 2 },
+      { midi: 49, duration: 0.5, string: 4, fret: 4 },
+      { midi: 47, duration: 0.5, string: 4, fret: 2 },
+      { midi: 50, duration: 0.5, string: 4, fret: 5 },
+      { midi: 47, duration: 0.5, string: 4, fret: 2 },
+      { midi: 51, duration: 0.5, string: 4, fret: 6 },
+      { midi: 47, duration: 0.5, string: 4, fret: 2 },
+      { midi: 52, duration: 0.5, string: 4, fret: 7 }
+    ]
   }
 ];
 
