@@ -1,0 +1,254 @@
+{
+  "id": "song_1789461399398",
+  "title": "Old McDonald",
+  "artist": "Ich",
+  "category": "Eigene Lieder",
+  "bpm": 100,
+  "timeSignature": [
+    4,
+    4
+  ],
+  "description": "Erstellt mit dem integrierten Gitarren-Song-Editor",
+  "notes": [
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 57,
+      "duration": 2,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 66,
+      "duration": 1,
+      "string": 0,
+      "fret": 2
+    },
+    {
+      "midi": 66,
+      "duration": 1,
+      "string": 0,
+      "fret": 2
+    },
+    {
+      "midi": 64,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "duration": 4,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 57,
+      "duration": 2,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 66,
+      "duration": 1,
+      "string": 0,
+      "fret": 2
+    },
+    {
+      "midi": 66,
+      "duration": 1,
+      "string": 0,
+      "fret": 2
+    },
+    {
+      "midi": 64,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "duration": 4,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 57,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    }
+  ]
+}
