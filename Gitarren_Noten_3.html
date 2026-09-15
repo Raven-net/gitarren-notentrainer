@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Gitarren-Notentrainer (Bund 0 - 4)</title>
+  <style>
+    :root {
+      --bg-color: #1a1a1a;
+      --card-bg: #2d2d2d;
+      --text-color: #f0f0f0;
+      --fretboard-wood: #3d2b1f;
+      --fret-wire: #c0c0c0;
+      --string-color: #dcdcdc;
+      --accent-color: #4CAF50;
+      --error-color: #f44336;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 1.6rem;
+    }
+
+    .controls-panel {
+      background: var(--card-bg);
+      padding: 12px 24px;
+      border-radius: 8px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    select, input[type="range"] {
+      background: #1e1e1e;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .stats {
+      font-weight: bold;
+      color: #8bc34a;
+    }
+
+    .detected-note {
+      font-family: monospace;
+      font-weight: bold;
+      background: #111;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #ffca28;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .audio-btn {
+      padding: 7px 13px;
+      cursor: pointer;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+
+    .audio-btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-irig {
+      background: #2e7d32;
+    }
+
+    .btn-mic {
+      background: #0277bd;
+    }
+
+    .btn-active {
+      background: #555 !important;
+      cursor: default;
+      outline: 2px solid #8bc34a;
+    }
+
+    #notation-container {
+      position: relative;
+      width: 900px;
+      height: 180px;
+      background: #faf8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      margin-bottom: 25px;
+    }
+
+    #notation-canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .fretboard-container {
+      background: var(--fretboard-wood);
+      padding: 20px 40px 10px 40px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 2px solid #553a2a;
+    }
+
+    .fretboard {
+      display: grid;
+      grid-template-columns: 80px repeat(4, 130px);
+      position: relative;
+    }
+
+    .fret-header {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #bbb;
+      padding-bottom: 8px;
+    }
+
+    .fret-column {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 240px;
+    }
+
+    .fret-column:not(:first-child) {
+      border-right: 4px solid var(--fret-wire);
+    }
+
+    .fret-column:first-child {
+      border-right: 8px solid #fdf5e6;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .fret-marker {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      background: #e0e0e0;
+      border-radius: 50%;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .note-target {
+      position: relative;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .string-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: var(--string-color);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .string-label {
+      position: absolute;
+      left: 10px;
+      font-size: 0.8rem;
+      color: #aaa;
+      pointer-events: none;
+      font-weight: bold;
+    }
+
+    .note-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .note-target:hover .note-btn {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.15);
+    }
+
+    .correct-flash {
+      background: var(--accent-color) !important;
+      box-shadow: 0 0 12px var(--accent-color);
+    }
+
+    .wrong-flash {
+      background: var(--error-color) !important;
+      box-shadow: 0 0 12px var(--error-color);
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gitarren-Notentrainer (Bund 0 bis 4)</h1>
+
+  <div class="controls-panel">
+    <div class="control-group">
+      <label for="mode-select">Modus:</label>
+      <select id="mode-select">
+        <option value="song" selected>Lieder (wartet auf Ton)</option>
+        <option value="endless">Endlos (fließend)</option>
+      </select>
+    </div>
+
+    <div class="control-group" id="song-select-group">
+      <label for="song-select">Lied:</label>
+      <select id="song-select">
+        <optgroup label="Rock">
+          <option value="smoke">Smoke on the Water (Deep Purple)</option>
+          <option value="seven_nation">Seven Nation Army (White Stripes)</option>
+          <option value="nem_intro">Nothing Else Matters (Intro)</option>
+        </optgroup>
+        <optgroup label="Klassiker & Traditionals">
+          <option value="ode">Ode an die Freude</option>
+          <option value="frere">Frère Jacques</option>
+          <option value="haenschen">Hänschen klein</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="control-group" id="speed-group" style="display: none;">
+      <label for="speed-slider">Tempo:</label>
+      <input type="range" id="speed-slider" min="0.5" max="3.5" step="0.1" value="1.2">
+      <span id="speed-val">1.2x</span>
+    </div>
+
+    <div class="control-group">
+      <span>Fortschritt / Punkte:</span>
+      <span id="score" class="stats">0</span>
+    </div>
+
+    <div class="control-group">
+      <span>Gespielt:</span>
+      <span id="pitch-display" class="detected-note">--</span>
+    </div>
+
+    <div class="control-group">
+      <button id="irig-btn" class="audio-btn btn-irig">
+        iRig HD 2 verbinden
+      </button>
+      <button id="mic-btn" class="audio-btn btn-mic">
+        Laptop-Mikrofon (Akustik)
+      </button>
+    </div>
+  </div>
+
+  <div id="notation-container">
+    <canvas id="notation-canvas" width="900" height="180"></canvas>
+  </div>
+
+  <div class="fretboard-container">
+    <div class="fretboard" id="fretboard"></div>
+  </div>
+
+  <script>
+    // --- Notendefinitionen ---
+    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H"];
+    const STRINGS = [
+      { name: "e", baseMidi: 64, gauge: 1 },
+      { name: "h", baseMidi: 59, gauge: 1.5 },
+      { name: "g", baseMidi: 55, gauge: 2 },
+      { name: "d", baseMidi: 50, gauge: 2.5 },
+      { name: "A", baseMidi: 45, gauge: 3 },
+      { name: "E", baseMidi: 40, gauge: 3.8 }
+    ];
+
+    const SEMITONE_TO_STEP = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]; 
+    function midiToDiatonicStep(midi) {
+      const octave = Math.floor(midi / 12) - 1;
+      const noteInOct = midi % 12;
+      return octave * 7 + SEMITONE_TO_STEP[noteInOct];
+    }
+
+    function createNote(midi, duration = 1) {
+      return {
+        midi: midi,
+        duration: duration, // 1 = Viertel, 2 = Halbe, 4 = Ganze
+        freq: 440 * Math.pow(2, (midi - 69) / 12),
+        diatonicStep: midiToDiatonicStep(midi) - midiToDiatonicStep(52)
+      };
+    }
+
+    const DIATONIC_SEMITONES = [0, 2, 4, 5, 7, 9, 11];
+    const POOL = [];
+
+    for (let s = 0; s < 6; s++) {
+      for (let f = 0; f <= 4; f++) {
+        const midi = STRINGS[s].baseMidi + f;
+        if (DIATONIC_SEMITONES.includes(midi % 12)) {
+          POOL.push({
+            string: s,
+            fret: f,
+            ...createNote(midi, 1)
+          });
+        }
+      }
+    }
+
+    // --- Song-Repertoire (Reine 4/4-Takte mit Ganzen, Halben und Vierteln) ---
+    // MIDI-Referenz: E2=40, G2=43, A2=45, H2=47, C3=48, D3=50, E3=52, G3=55, A3=57, H3=59, C4=60, D4=62, E4=64, F4=65, G4=67
+    const SONGS = {
+      // 1. Smoke on the Water (D- und G-Saite / Bund 0-3)
+      smoke: [
+        // Takt 1: D (1), F (1), G (2)
+        createNote(50, 1), createNote(53, 1), createNote(55, 2),
+        // Takt 2: D (1), F (1), G# (1), G (1)
+        createNote(50, 1), createNote(53, 1), createNote(56, 1), createNote(55, 1),
+        // Takt 3: D (1), F (1), G (2)
+        createNote(50, 1), createNote(53, 1), createNote(55, 2),
+        // Takt 4: F (1), D (1), D (2)
+        createNote(53, 1), createNote(50, 1), createNote(50, 2)
+      ],
+
+      // 2. Seven Nation Army (E- und A-Saite)
+      seven_nation: [
+        // Takt 1: E (2), E (1), G (1)
+        createNote(40, 2), createNote(40, 1), createNote(43, 1),
+        // Takt 2: E (1), D (1), C (2)
+        createNote(40, 1), createNote(38, 1), createNote(36, 2),
+        // Takt 3: H (4)
+        createNote(47, 4),
+        // Takt 4: E (2), E (1), G (1)
+        createNote(40, 2), createNote(40, 1), createNote(43, 1),
+        // Takt 5: E (1), D (1), C (1), D (1)
+        createNote(40, 1), createNote(38, 1), createNote(36, 1), createNote(38, 1),
+        // Takt 6: C (2), H (2)
+        createNote(36, 2), createNote(47, 2)
+      ],
+
+      // 3. Nothing Else Matters - Intro (Leere Saiten)
+      nem_intro: [
+        // Takt 1: E - G - H - e
+        createNote(40, 1), createNote(55, 1), createNote(59, 1), createNote(64, 1),
+        // Takt 2: H - G - E - Pause/Halbe E
+        createNote(59, 1), createNote(55, 1), createNote(40, 2),
+        // Takt 3: E - G - H - e
+        createNote(40, 1), createNote(55, 1), createNote(59, 1), createNote(64, 1),
+        // Takt 4: e - H - G - E
+        createNote(64, 1), createNote(59, 1), createNote(55, 1), createNote(40, 1)
+      ],
+
+      // 4. Ode an die Freude
+      ode: [
+        // Takt 1
+        createNote(64, 1), createNote(64, 1), createNote(65, 1), createNote(67, 1),
+        // Takt 2
+        createNote(67, 1), createNote(65, 1), createNote(64, 1), createNote(62, 1),
+        // Takt 3
+        createNote(60, 1), createNote(60, 1), createNote(62, 1), createNote(64, 1),
+        // Takt 4
+        createNote(64, 2), createNote(62, 2),
+        // Takt 5
+        createNote(64, 1), createNote(64, 1), createNote(65, 1), createNote(67, 1),
+        // Takt 6
+        createNote(67, 1), createNote(65, 1), createNote(64, 1), createNote(62, 1),
+        // Takt 7
+        createNote(60, 1), createNote(60, 1), createNote(62, 1), createNote(64, 1),
+        // Takt 8
+        createNote(62, 2), createNote(60, 2)
+      ],
+
+      // 5. Frère Jacques (Korrigiert ohne Achtelnoten, sauber im 4/4-Raster)
+      frere: [
+        // Takt 1
+        createNote(60, 1), createNote(62, 1), createNote(64, 1), createNote(60, 1),
+        // Takt 2
+        createNote(60, 1), createNote(62, 1), createNote(64, 1), createNote(60, 1),
+        // Takt 3
+        createNote(64, 1), createNote(65, 1), createNote(67, 2),
+        // Takt 4
+        createNote(64, 1), createNote(65, 1), createNote(67, 2),
+        // Takt 5
+        createNote(67, 1), createNote(65, 1), createNote(64, 1), createNote(60, 1),
+        // Takt 6
+        createNote(67, 1), createNote(65, 1), createNote(64, 1), createNote(60, 1),
+        // Takt 7
+        createNote(60, 1), createNote(55, 1), createNote(60, 2),
+        // Takt 8
+        createNote(60, 1), createNote(55, 1), createNote(60, 2)
+      ],
+
+      // 6. Hänschen klein
+      haenschen: [
+        // Takt 1
+        createNote(67, 1), createNote(64, 1), createNote(64, 2),
+        // Takt 2
+        createNote(65, 1), createNote(62, 1), createNote(62, 2),
+        // Takt 3
+        createNote(60, 1), createNote(62, 1), createNote(64, 1), createNote(65, 1),
+        // Takt 4
+        createNote(67, 1), createNote(67, 1), createNote(67, 2),
+        // Takt 5
+        createNote(67, 1), createNote(64, 1), createNote(64, 2),
+        // Takt 6
+        createNote(65, 1), createNote(62, 1), createNote(62, 2),
+        // Takt 7
+        createNote(60, 1), createNote(64, 1), createNote(67, 1), createNote(67, 1),
+        // Takt 8
+        createNote(60, 4)
+      ]
+    };
+
+    // --- State & DOM-Referenzen ---
+    let currentMode = 'song';
+    let activeNotes = [];
+    let currentSongNotes = [];
+    let currentSongIndex = 0;
+    let songScrollOffset = 0;
+    let score = 0;
+    let speedMultiplier = 1.2;
+    let lastSpawnTime = 0;
+
+    const canvas = document.getElementById('notation-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    const pitchDisplay = document.getElementById('pitch-display');
+    const modeSelect = document.getElementById('mode-select');
+    const songSelect = document.getElementById('song-select');
+    const songSelectGroup = document.getElementById('song-select-group');
+    const speedGroup = document.getElementById('speed-group');
+
+    const irigBtn = document.getElementById('irig-btn');
+    const micBtn = document.getElementById('mic-btn');
+
+    const HIT_LINE_X = 140;
+    const NOTE_SPACING_UNIT = 80;
+
+    function loadSong(songKey) {
+      currentSongIndex = 0;
+      songScrollOffset = 0;
+      currentSongNotes = (SONGS[songKey] || SONGS['smoke']).map((n, idx) => ({
+        ...n,
+        id: idx
+      }));
+      updateScoreDisplay();
+    }
+
+    function updateScoreDisplay() {
+      if (currentMode === 'song') {
+        scoreDisplay.innerText = `${currentSongIndex} / ${currentSongNotes.length}`;
+      } else {
+        scoreDisplay.innerText = score;
+      }
+    }
+
+    modeSelect.addEventListener('change', (e) => {
+      currentMode = e.target.value;
+      if (currentMode === 'song') {
+        songSelectGroup.style.display = 'flex';
+        speedGroup.style.display = 'none';
+        loadSong(songSelect.value);
+      } else {
+        songSelectGroup.style.display = 'none';
+        speedGroup.style.display = 'flex';
+        activeNotes = [];
+        score = 0;
+        updateScoreDisplay();
+      }
+    });
+
+    songSelect.addEventListener('change', (e) => {
+      loadSong(e.target.value);
+    });
+
+    document.getElementById('speed-slider').addEventListener('input', (e) => {
+      speedMultiplier = parseFloat(e.target.value);
+      document.getElementById('speed-val').innerText = speedMultiplier.toFixed(1) + 'x';
+    });
+
+    // --- Griffbrett UI ---
+    const fretboardEl = document.getElementById('fretboard');
+    const fretButtons = {};
+
+    for (let f = 0; f <= 4; f++) {
+      const col = document.createElement('div');
+      col.className = 'fret-column';
+
+      const header = document.createElement('div');
+      header.className = 'fret-header';
+      header.innerText = f === 0 ? 'Offen (0)' : `Bund ${f}`;
+      col.appendChild(header);
+
+      if (f === 3) {
+        const marker = document.createElement('div');
+        marker.className = 'fret-marker';
+        col.appendChild(marker);
+      }
+
+      for (let s = 0; s < 6; s++) {
+        const target = document.createElement('div');
+        target.className = 'note-target';
+
+        const line = document.createElement('div');
+        line.className = 'string-line';
+        line.style.height = `${STRINGS[s].gauge}px`;
+        target.appendChild(line);
+
+        if (f === 0) {
+          const lbl = document.createElement('span');
+          lbl.className = 'string-label';
+          lbl.innerText = STRINGS[s].name;
+          target.appendChild(lbl);
+        }
+
+        const btn = document.createElement('div');
+        btn.className = 'note-btn';
+        target.appendChild(btn);
+
+        const midi = STRINGS[s].baseMidi + f;
+        fretButtons[`${s}-${f}`] = btn;
+
+        target.addEventListener('mousedown', () => evaluateNoteAttempt(midi, btn));
+        col.appendChild(target);
+      }
+      fretboardEl.appendChild(col);
+    }
+
+    // --- Audio Feedback Synth ---
+    let audioCtx = null;
+    let analyserNode = null;
+    let micStream = null;
+    let audioBuffer = null;
+    let rmsThreshold = 0.015;
+
+    function playTone(freq, isSuccess = true) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (isSuccess) {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+    }
+
+    // --- Trefferlogik ---
+    let lastHitMidi = -1;
+    let lastHitTime = 0;
+
+    function evaluateNoteAttempt(playedMidi, btnElement = null) {
+      let targetMidi = null;
+
+      if (currentMode === 'endless') {
+        if (activeNotes.length > 0) targetMidi = activeNotes[0].midi;
+      } else {
+        if (currentSongIndex < currentSongNotes.length) {
+          targetMidi = currentSongNotes[currentSongIndex].midi;
+        }
+      }
+
+      if (targetMidi === null) return;
+
+      if (playedMidi === targetMidi) {
+        const freq = 440 * Math.pow(2, (targetMidi - 69) / 12);
+        playTone(freq, true);
+        highlightMatchingButtons(playedMidi, 'correct-flash');
+
+        if (currentMode === 'endless') {
+          activeNotes.shift();
+          score++;
+        } else {
+          currentSongIndex++;
+          if (currentSongIndex >= currentSongNotes.length) {
+            setTimeout(() => {
+              alert("Klasse! Lied erfolgreich durchgespielt!");
+              loadSong(songSelect.value);
+            }, 300);
+          }
+        }
+        updateScoreDisplay();
+      } else if (btnElement) {
+        playTone(0, false);
+        btnElement.classList.add('wrong-flash');
+        setTimeout(() => btnElement.classList.remove('wrong-flash'), 250);
+      }
+    }
+
+    function highlightMatchingButtons(midi, className) {
+      for (let s = 0; s < 6; s++) {
+        for (let f = 0; f <= 4; f++) {
+          if (STRINGS[s].baseMidi + f === midi) {
+            const btn = fretButtons[`${s}-${f}`];
+            if (btn) {
+              btn.classList.add(className);
+              setTimeout(() => btn.classList.remove(className), 250);
+            }
+          }
+        }
+      }
+    }
+
+    // --- Pitch Detection (Autokorrelation) ---
+    function autoCorrelate(buf, sampleRate) {
+      let rms = 0;
+      for (let i = 0; i < buf.length; i++) {
+        rms += buf[i] * buf[i];
+      }
+      rms = Math.sqrt(rms / buf.length);
+      if (rms < rmsThreshold) return -1;
+
+      let r1 = 0, r2 = buf.length - 1;
+      const thres = 0.2;
+      for (let i = 0; i < buf.length / 2; i++) {
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+      }
+      for (let i = 1; i < buf.length / 2; i++) {
+        if (Math.abs(buf[buf.length - i]) < thres) { r2 = buf.length - i; break; }
+      }
+      const trimmed = buf.slice(r1, r2);
+      const c = new Float32Array(trimmed.length).fill(0);
+
+      for (let lag = 0; lag < trimmed.length; lag++) {
+        for (let i = 0; i < trimmed.length - lag; i++) {
+          c[lag] += trimmed[i] * trimmed[i + lag];
+        }
+      }
+
+      let d = 0;
+      while (c[d] > c[d + 1]) d++;
+      let maxval = -1, maxpos = -1;
+      for (let i = d; i < trimmed.length; i++) {
+        if (c[i] > maxval) {
+          maxval = c[i];
+          maxpos = i;
+        }
+      }
+      let T0 = maxpos;
+
+      if (T0 > 0 && T0 < trimmed.length - 1) {
+        const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+        const a = (x1 + x3 - 2 * x2) / 2;
+        const b = (x3 - x1) / 2;
+        if (a) T0 = T0 - b / (2 * a);
+      }
+
+      return sampleRate / T0;
+    }
+
+    let detectedMidiStreak = -1;
+    let streakCount = 0;
+
+    function processPitch() {
+      if (!analyserNode) return;
+
+      analyserNode.getFloatTimeDomainData(audioBuffer);
+      const freq = autoCorrelate(audioBuffer, audioCtx.sampleRate);
+
+      if (freq > 75 && freq < 450) {
+        const midiExact = 69 + 12 * Math.log2(freq / 440);
+        const midiRounded = Math.round(midiExact);
+        const centsOff = Math.floor((midiExact - midiRounded) * 100);
+
+        if (Math.abs(centsOff) < 42) {
+          const noteName = NOTE_NAMES[midiRounded % 12];
+          const oct = Math.floor(midiRounded / 12) - 1;
+          pitchDisplay.innerText = `${noteName}${oct}`;
+
+          if (midiRounded === detectedMidiStreak) {
+            streakCount++;
+            const now = performance.now();
+            if (streakCount === 2 && (now - lastHitTime > 320 || lastHitMidi !== midiRounded)) {
+              lastHitMidi = midiRounded;
+              lastHitTime = now;
+              evaluateNoteAttempt(midiRounded);
+            }
+          } else {
+            detectedMidiStreak = midiRounded;
+            streakCount = 1;
+          }
+        }
+      } else {
+        pitchDisplay.innerText = "--";
+        detectedMidiStreak = -1;
+        streakCount = 0;
+      }
+
+      requestAnimationFrame(processPitch);
+    }
+
+    // --- Audio-Initialisierung ---
+    async function startAudio(type) {
+      try {
+        if (micStream) {
+          micStream.getTracks().forEach(track => track.stop());
+        }
+
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const constraints = {
+          audio: {
+            echoCancellation: false,
+            autoGainControl: false,
+            noiseSuppression: false,
+            latency: 0
+          }
+        };
+
+        micStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const source = audioCtx.createMediaStreamSource(micStream);
+        
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 2048;
+        audioBuffer = new Float32Array(analyserNode.fftSize);
+
+        if (type === 'mic') {
+          const highPass = audioCtx.createBiquadFilter();
+          highPass.type = "highpass";
+          highPass.frequency.setValueAtTime(75, audioCtx.currentTime);
+
+          const lowPass = audioCtx.createBiquadFilter();
+          lowPass.type = "lowpass";
+          lowPass.frequency.setValueAtTime(750, audioCtx.currentTime);
+
+          source.connect(highPass);
+          highPass.connect(lowPass);
+          lowPass.connect(analyserNode);
+
+          rmsThreshold = 0.022;
+
+          micBtn.innerText = "Laptop-Mikrofon aktiv ✓";
+          micBtn.classList.add('btn-active');
+          irigBtn.innerText = "Zu iRig wechseln";
+          irigBtn.classList.remove('btn-active');
+        } else {
+          source.connect(analyserNode);
+          rmsThreshold = 0.015;
+
+          irigBtn.innerText = "iRig aktiv ✓";
+          irigBtn.classList.add('btn-active');
+          micBtn.innerText = "Zu Laptop-Mikrofon wechseln";
+          micBtn.classList.remove('btn-active');
+        }
+
+        processPitch();
+      } catch (err) {
+        alert("Audioeingang konnte nicht gestartet werden: " + err.message);
+      }
+    }
+
+    irigBtn.addEventListener('click', () => startAudio('irig'));
+    micBtn.addEventListener('click', () => startAudio('mic'));
+
+    // --- Notensystem Renderer ---
+    const LINE_SPACING = 12;
+    const STAFF_TOP = 85;
+
+    function getYForStep(step) {
+      const bottomLineY = STAFF_TOP + 4 * LINE_SPACING;
+      return bottomLineY - (step * (LINE_SPACING / 2));
+    }
+
+    function drawStaff() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 5; i++) {
+        const y = STAFF_TOP + i * LINE_SPACING;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#222';
+      ctx.font = '55px serif';
+      ctx.fillText('𝄞', 15, STAFF_TOP + 3.8 * LINE_SPACING);
+
+      ctx.font = 'bold 22px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('4', 68, STAFF_TOP + 1.8 * LINE_SPACING);
+      ctx.fillText('4', 68, STAFF_TOP + 3.8 * LINE_SPACING);
+      ctx.textAlign = 'left';
+
+      ctx.strokeStyle = 'rgba(76, 175, 80, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(HIT_LINE_X, 15);
+      ctx.lineTo(HIT_LINE_X, canvas.height - 15);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawBarLine(x) {
+      if (x < 75 || x > canvas.width + 20) return;
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, STAFF_TOP);
+      ctx.lineTo(x, STAFF_TOP + 4 * LINE_SPACING);
+      ctx.stroke();
+    }
+
+    function drawNote(x, diatonicStep, duration = 1, isTarget = false) {
+      const y = getYForStep(diatonicStep);
+
+      // Hilfslinien
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 1.5;
+      if (diatonicStep <= -2) {
+        for (let s = -2; s >= diatonicStep; s -= 2) {
+          const ly = getYForStep(s);
+          ctx.beginPath();
+          ctx.moveTo(x - 14, ly);
+          ctx.lineTo(x + 14, ly);
+          ctx.stroke();
+        }
+      }
+      if (diatonicStep >= 10) {
+        for (let s = 10; s <= diatonicStep; s -= 2) {
+          const ly = getYForStep(s);
+          ctx.beginPath();
+          ctx.moveTo(x - 14, ly);
+          ctx.lineTo(x + 14, ly);
+          ctx.stroke();
+        }
+      }
+
+      const activeColor = isTarget ? '#d32f2f' : '#111';
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(-0.25);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 8.5, 6, 0, 0, Math.PI * 2);
+
+      if (duration >= 2) {
+        // Halbe oder Ganze Note
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+      } else {
+        // Viertelnote
+        ctx.fillStyle = activeColor;
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Notenhals nur bei Noten kleiner als eine Ganze
+      if (duration < 4) {
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        if (diatonicStep < 4) {
+          ctx.moveTo(x + 7, y - 2);
+          ctx.lineTo(x + 7, y - 35);
+        } else {
+          ctx.moveTo(x - 7, y + 2);
+          ctx.lineTo(x - 7, y + 35);
+        }
+        ctx.stroke();
+      }
+    }
+
+    // --- Game Loop ---
+    let lastFrameTime = performance.now();
+
+    function spawnEndlessNote() {
+      const template = POOL[Math.floor(Math.random() * POOL.length)];
+      activeNotes.push({
+        ...template,
+        x: canvas.width + 20
+      });
+    }
+
+    function gameLoop(now) {
+      const dt = (now - lastFrameTime) / 1000;
+      lastFrameTime = now;
+
+      drawStaff();
+
+      if (currentMode === 'endless') {
+        const spawnInterval = 2800 / speedMultiplier;
+        if (now - lastSpawnTime > spawnInterval) {
+          spawnEndlessNote();
+          lastSpawnTime = now;
+        }
+
+        const moveDistance = 75 * speedMultiplier * dt;
+        for (let i = activeNotes.length - 1; i >= 0; i--) {
+          activeNotes[i].x -= moveDistance;
+          if (activeNotes[i].x < 40) {
+            activeNotes.splice(i, 1);
+          }
+        }
+
+        for (let i = 0; i < activeNotes.length; i++) {
+          const note = activeNotes[i];
+          drawNote(note.x, note.diatonicStep, 1, i === 0);
+        }
+
+      } else {
+        // Song-Modus
+        let targetScroll = 0;
+        for (let i = 0; i < currentSongIndex; i++) {
+          targetScroll += (currentSongNotes[i].duration || 1) * NOTE_SPACING_UNIT;
+        }
+
+        songScrollOffset += (targetScroll - songScrollOffset) * Math.min(dt * 9, 1);
+
+        let currentPos = 0;
+        let measureBeats = 0;
+
+        for (let i = 0; i < currentSongNotes.length; i++) {
+          const note = currentSongNotes[i];
+          const noteX = HIT_LINE_X + (currentPos - songScrollOffset);
+
+          if (noteX >= 50 && noteX <= canvas.width + 40) {
+            drawNote(noteX, note.diatonicStep, note.duration, i === currentSongIndex);
+          }
+
+          currentPos += note.duration * NOTE_SPACING_UNIT;
+          measureBeats += note.duration;
+
+          // Robuste 4/4-Taktgrenzenprüfung
+          if (measureBeats >= 4) {
+            const barLineX = HIT_LINE_X + (currentPos - songScrollOffset) - (NOTE_SPACING_UNIT * 0.35);
+            drawBarLine(barLineX);
+            measureBeats = 0;
+          }
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    loadSong('smoke');
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

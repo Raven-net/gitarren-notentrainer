@@ -1,0 +1,128 @@
+/* Song Editor Toolbar and Controls */
+.editor-panel {
+  width: 100%;
+  background: #1c1f26;
+  border: 1px solid #3b4252;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.editor-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #2e3440;
+  padding-bottom: 10px;
+}
+
+.editor-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.editor-input {
+  background: #111317;
+  border: 1px solid #374151;
+  color: #f3f4f6;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.duration-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #111317;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #374151;
+}
+
+.duration-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.duration-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.duration-btn.active {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border-color: #60a5fa;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.notes-timeline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  background: #111317;
+  border-radius: var(--radius-sm);
+  min-height: 52px;
+  border: 1px dashed #374151;
+}
+
+.note-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #282e3a;
+  border: 1px solid #3d4659;
+  color: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.note-chip:hover {
+  border-color: #60a5fa;
+  background: #333b4a;
+}
+
+.note-chip.selected {
+  border-color: #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  background: #1e3a5f;
+}
+
+.note-chip-del {
+  color: #ef4444;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 2px;
+  font-size: 0.9rem;
+}
+
+.note-chip-del:hover {
+  color: #f87171;
+}

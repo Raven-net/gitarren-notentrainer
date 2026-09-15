@@ -1,0 +1,24 @@
+{
+  "id": "smoke",
+  "title": "Smoke on the Water",
+  "artist": "Deep Purple",
+  "category": "Rock",
+  "bpm": 112,
+  "timeSignature": [4, 4],
+  "description": "Riff auf D- und G-Saite (Bund 0-3)",
+  "notes": [
+    { "midi": 50, "duration": 1 },
+    { "midi": 53, "duration": 1 },
+    { "midi": 55, "duration": 2 },
+    { "midi": 50, "duration": 1 },
+    { "midi": 53, "duration": 1 },
+    { "midi": 56, "duration": 1 },
+    { "midi": 55, "duration": 1 },
+    { "midi": 50, "duration": 1 },
+    { "midi": 53, "duration": 1 },
+    { "midi": 55, "duration": 2 },
+    { "midi": 53, "duration": 1 },
+    { "midi": 50, "duration": 1 },
+    { "midi": 50, "duration": 2 }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "seven_nation",
+  "title": "Seven Nation Army",
+  "artist": "The White Stripes",
+  "category": "Rock",
+  "bpm": 120,
+  "timeSignature": [4, 4],
+  "description": "Kult-Basslinie auf der Gitarre (E- und A-Saite)",
+  "notes": [
+    { "midi": 40, "duration": 2 },
+    { "midi": 40, "duration": 1 },
+    { "midi": 43, "duration": 1 },
+    { "midi": 40, "duration": 1 },
+    { "midi": 38, "duration": 1 },
+    { "midi": 36, "duration": 2 },
+    { "midi": 47, "duration": 4 },
+    { "midi": 40, "duration": 2 },
+    { "midi": 40, "duration": 1 },
+    { "midi": 43, "duration": 1 },
+    { "midi": 40, "duration": 1 },
+    { "midi": 38, "duration": 1 },
+    { "midi": 36, "duration": 1 },
+    { "midi": 38, "duration": 1 },
+    { "midi": 36, "duration": 2 },
+    { "midi": 47, "duration": 2 }
+  ]
+}

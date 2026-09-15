@@ -1,0 +1,21 @@
+# Betriebssystem- & Editor-Dateien
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Node / Web-Builds (falls verwendet)
+node_modules/
+dist/
+build/
+.cache/
+
+# Python-Dateien (falls Hilfsskripte verwendet werden)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/

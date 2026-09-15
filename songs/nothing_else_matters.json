@@ -1,0 +1,26 @@
+{
+  "id": "nem_intro",
+  "title": "Nothing Else Matters (Intro)",
+  "artist": "Metallica",
+  "category": "Rock",
+  "bpm": 92,
+  "timeSignature": [4, 4],
+  "description": "Berühmtes Fingerpicking-Intro auf leeren Saiten",
+  "notes": [
+    { "midi": 40, "duration": 1 },
+    { "midi": 55, "duration": 1 },
+    { "midi": 59, "duration": 1 },
+    { "midi": 64, "duration": 1 },
+    { "midi": 59, "duration": 1 },
+    { "midi": 55, "duration": 1 },
+    { "midi": 40, "duration": 2 },
+    { "midi": 40, "duration": 1 },
+    { "midi": 55, "duration": 1 },
+    { "midi": 59, "duration": 1 },
+    { "midi": 64, "duration": 1 },
+    { "midi": 64, "duration": 1 },
+    { "midi": 59, "duration": 1 },
+    { "midi": 55, "duration": 1 },
+    { "midi": 40, "duration": 1 }
+  ]
+}

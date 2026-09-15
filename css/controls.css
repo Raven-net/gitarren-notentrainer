@@ -1,0 +1,182 @@
+/* Controls Panel */
+.controls-panel {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.control-group label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+select, input[type="text"], input[type="number"] {
+  background: #181a1f;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select:focus, input:focus {
+  border-color: var(--accent-blue);
+}
+
+input[type="range"] {
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+  height: 6px;
+}
+
+/* Audio Devices & Level Meter */
+.audio-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #16181d;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #2d3039;
+}
+
+.audio-btn {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  color: #fff;
+}
+
+.btn-irig {
+  background: #15803d;
+}
+.btn-irig:hover {
+  background: #16a34a;
+}
+
+.btn-mic {
+  background: #0369a1;
+}
+.btn-mic:hover {
+  background: #0284c7;
+}
+
+.audio-btn.active {
+  box-shadow: 0 0 0 2px var(--accent-green);
+  opacity: 1;
+  position: relative;
+}
+
+.level-meter-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.level-meter-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.level-meter-bar {
+  width: 70px;
+  height: 10px;
+  background: #1f2229;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #333842;
+  position: relative;
+}
+
+.level-meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #22c55e 0%, #eab308 75%, #ef4444 95%);
+  transition: width 0.05s ease-out;
+}
+
+/* Indicators */
+.detected-note-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #16181d;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #2d3039;
+}
+
+.detected-note-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #fbbf24;
+  min-width: 48px;
+  text-align: center;
+}
+
+.status-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.15);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.bpm-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* Checkbox Toggle */
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.toggle-label input[type="checkbox"] {
+  accent-color: var(--accent-green);
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+}
