@@ -1,5 +1,6 @@
 import { createNote } from '../models/Note.js';
 import { Song } from '../models/Song.js';
+import { MidiImporter } from '../midi/MidiImporter.js';
 
 export class SongEditorMode {
   constructor(options = {}) {
@@ -57,7 +58,7 @@ export class SongEditorMode {
         <button id="editor-clear-btn" class="btn btn-danger">Alle löschen</button>
         <label class="btn" style="cursor:pointer;">
           📂 JSON / MIDI laden
-          <input type="file" id="editor-file-input" accept=".json,.mid,.midi" style="display:none;">
+          <input type="file" id="editor-file-input" accept=".json,.mid,.midi,.MID,.MIDI" style="display:none;">
         </label>
       </div>
 
@@ -357,25 +358,37 @@ export class SongEditorMode {
     }
   }
 
-  handleFileImport(e) {
+  async handleFileImport(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.name.endsWith('.json')) {
+    const lowerName = file.name.toLowerCase();
+
+    if (lowerName.endsWith('.json')) {
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
           const data = JSON.parse(event.target.result);
           this.loadSongData(data);
-          alert(`Lied "${data.title}" erfolgreich geladen!`);
+          alert(`Lied "${data.title}" erfolgreich in den Editor geladen!`);
         } catch (err) {
           alert("Fehler beim Lesen der JSON-Datei: " + err.message);
         }
       };
       reader.readAsText(file);
+    } else if (lowerName.endsWith('.mid') || lowerName.endsWith('.midi')) {
+      try {
+        const songData = await MidiImporter.parseMidiFile(file);
+        this.loadSongData(songData);
+        alert(`MIDI "${songData.title}" erfolgreich in den Editor importiert (${songData.notes.length} Noten)!`);
+      } catch (err) {
+        alert("Fehler beim Importieren der MIDI-Datei: " + err.message);
+      }
     } else {
-      alert("Für MIDI-Dateien: Bitte Datei über die MIDI-Schaltfläche importieren.");
+      alert("Bitte wähle eine .json oder .mid / .midi Datei aus.");
     }
+
+    e.target.value = '';
   }
 
   loadSongData(data) {

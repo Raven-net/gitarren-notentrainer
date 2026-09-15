@@ -30,6 +30,7 @@ class GuitarApp {
     this.modeSelect = document.getElementById('mode-select');
     this.songSelect = document.getElementById('song-select');
     this.songSelectGroup = document.getElementById('song-select-group');
+    this.mainFileInput = document.getElementById('main-file-input');
     this.speedGroup = document.getElementById('speed-group');
     this.speedSlider = document.getElementById('speed-slider');
     this.speedValDisplay = document.getElementById('speed-val');
@@ -122,6 +123,15 @@ class GuitarApp {
         this.loadCurrentSongIntoMode();
       }
     });
+
+    if (this.mainFileInput) {
+      this.mainFileInput.addEventListener('change', async (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          await this.loadFile(e.target.files[0]);
+          e.target.value = '';
+        }
+      });
+    }
 
     this.speedSlider.addEventListener('input', (e) => {
       const spd = parseFloat(e.target.value);
@@ -380,26 +390,44 @@ class GuitarApp {
     e.preventDefault();
     if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
     const file = e.dataTransfer.files[0];
+    await this.loadFile(file);
+  }
 
-    if (file.name.endsWith('.json')) {
+  async loadFile(file) {
+    if (!file) return;
+    const lowerName = file.name.toLowerCase();
+
+    if (lowerName.endsWith('.json')) {
       try {
         const text = await file.text();
         const data = JSON.parse(text);
-        const newSong = new Song(data);
-        this.registerNewSong(newSong);
-        alert(`Lied "${newSong.title}" erfolgreich importiert!`);
+        if (this.currentModeName === 'editor') {
+          this.editorMode.loadSongData(data);
+          alert(`Lied "${data.title || file.name}" in den Editor geladen!`);
+        } else {
+          const newSong = new Song(data);
+          this.registerNewSong(newSong);
+          alert(`Lied "${newSong.title}" erfolgreich importiert!`);
+        }
       } catch (err) {
         alert("Fehler beim Laden der JSON-Datei: " + err.message);
       }
-    } else if (file.name.endsWith('.mid') || file.name.endsWith('.midi')) {
+    } else if (lowerName.endsWith('.mid') || lowerName.endsWith('.midi')) {
       try {
         const songData = await MidiImporter.parseMidiFile(file);
-        const newSong = new Song(songData);
-        this.registerNewSong(newSong);
-        alert(`MIDI "${newSong.title}" erfolgreich importiert und für Gitarre vorbereitet!`);
+        if (this.currentModeName === 'editor') {
+          this.editorMode.loadSongData(songData);
+          alert(`MIDI "${songData.title}" erfolgreich in den Editor geladen (${songData.notes.length} Noten)!`);
+        } else {
+          const newSong = new Song(songData);
+          this.registerNewSong(newSong);
+          alert(`MIDI "${newSong.title}" erfolgreich importiert und für Gitarre vorbereitet! (${newSong.notes.length} Noten)`);
+        }
       } catch (err) {
         alert("Fehler beim Importieren der MIDI-Datei: " + err.message);
       }
+    } else {
+      alert("Nicht unterstütztes Dateiformat. Bitte wähle eine .json oder .mid / .midi Datei.");
     }
   }
 

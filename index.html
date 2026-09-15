@@ -39,6 +39,10 @@
         <div class="control-group" id="song-select-group">
           <label for="song-select">Lied:</label>
           <select id="song-select"></select>
+          <label class="btn" style="cursor:pointer; padding: 5px 10px; font-size: 0.82rem;" title="Song- (.json) oder MIDI-Datei (.mid) öffnen">
+            📂 Datei öffnen
+            <input type="file" id="main-file-input" accept=".json,.mid,.midi,.MID,.MIDI" style="display:none;">
+          </label>
         </div>
 
         <div class="control-group" id="bpm-group" style="display: none;">
