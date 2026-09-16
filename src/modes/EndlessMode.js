@@ -19,7 +19,7 @@ export class EndlessMode {
 
     this.activeNotes = [];
     this.score = 0;
-    this.speedMultiplier = 1.2;
+    this.speedMultiplier = options.speedMultiplier !== undefined ? options.speedMultiplier : 1.0;
     this.scrollBeat = -2; // 2 Beats Vorlaufzeit vor der ersten Note
     this.nextSpawnBeat = 0; // Erste Note startet auf Takt 1, Beat 0
   }

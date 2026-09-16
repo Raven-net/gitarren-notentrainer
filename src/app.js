@@ -196,11 +196,24 @@ class GuitarApp {
       });
     }
 
-    this.speedSlider.addEventListener('input', (e) => {
-      const spd = parseFloat(e.target.value);
-      this.speedValDisplay.innerText = spd.toFixed(1) + 'x';
-      this.endlessMode.setSpeed(spd);
-    });
+    if (this.speedSlider) {
+      const savedSpeed = localStorage.getItem('endless_speed_multiplier');
+      if (savedSpeed) {
+        const spd = parseFloat(savedSpeed);
+        if (!isNaN(spd) && spd >= 0.1 && spd <= 3.0) {
+          this.speedSlider.value = spd.toString();
+          this.speedValDisplay.innerText = spd.toFixed(1) + 'x';
+          this.endlessMode.setSpeed(spd);
+        }
+      }
+
+      this.speedSlider.addEventListener('input', (e) => {
+        const spd = parseFloat(e.target.value);
+        this.speedValDisplay.innerText = spd.toFixed(1) + 'x';
+        localStorage.setItem('endless_speed_multiplier', spd.toString());
+        this.endlessMode.setSpeed(spd);
+      });
+    }
 
     if (this.endlessKeySelect) {
       const savedKey = localStorage.getItem('endless_key_selection') || 'c_major';
