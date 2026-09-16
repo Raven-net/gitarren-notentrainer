@@ -11,37 +11,52 @@
   "description": "Klassisches Gitarrenstück / Intro von Jürg Hochweber",
   "notes": [
     {
-      "midi": 60,
-      "beat": 0,
-      "duration": 0.5
-    },
-    {
-      "midi": 60,
-      "beat": 1,
-      "duration": 0.5
-    },
-    {
-      "midi": 60,
-      "beat": 2,
-      "duration": 0.5
-    },
-    {
-      "midi": 60,
+      "midi": 52,
       "beat": 3,
       "duration": 0.5
     },
     {
-      "midi": 60,
-      "beat": 4,
+      "midi": 53,
+      "beat": 3.5,
       "duration": 0.5
     },
     {
-      "midi": 52,
+      "midi": 55,
+      "beat": 4,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 4.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
+      "beat": 5,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 5.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
+      "beat": 6,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 6.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
       "beat": 7,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 57,
       "beat": 7.5,
       "duration": 0.5
     },
@@ -56,7 +71,7 @@
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 9,
       "duration": 1
     },
@@ -91,17 +106,17 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 12.5,
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 50,
       "beat": 13,
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 13.5,
       "duration": 1
     },
@@ -111,7 +126,7 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 14.5,
       "duration": 1
     },
@@ -131,37 +146,37 @@
       "duration": 1
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 16.5,
       "duration": 1
     },
     {
-      "midi": 50,
+      "midi": 52,
       "beat": 17,
       "duration": 1
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 17.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 48,
       "beat": 18,
-      "duration": 1
+      "duration": 0.5
     },
     {
-      "midi": 65,
+      "midi": 48,
       "beat": 18.5,
-      "duration": 1
+      "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 19,
       "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 53,
       "beat": 19.5,
       "duration": 0.5
     },
@@ -176,7 +191,7 @@
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 55,
       "beat": 21,
       "duration": 1
     },
@@ -186,22 +201,22 @@
       "duration": 1
     },
     {
-      "midi": 48,
+      "midi": 55,
       "beat": 22,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 48,
+      "midi": 64,
       "beat": 22.5,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 55,
       "beat": 23,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 57,
       "beat": 23.5,
       "duration": 0.5
     },
@@ -216,7 +231,7 @@
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 25,
       "duration": 1
     },
@@ -251,324 +266,324 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 28.5,
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 50,
       "beat": 29,
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 29.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 30,
       "duration": 1
     },
     {
-      "midi": 64,
-      "beat": 30.5,
-      "duration": 1
+      "midi": 53,
+      "beat": 30.75,
+      "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 31,
       "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 50,
       "beat": 31.5,
       "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 48,
       "beat": 32,
-      "duration": 1
+      "duration": 2
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 32.5,
       "duration": 1
     },
     {
-      "midi": 50,
+      "midi": 55,
       "beat": 33,
       "duration": 1
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 33.5,
       "duration": 1
     },
     {
-      "midi": 53,
+      "midi": 60,
       "beat": 34,
-      "duration": 1
-    },
-    {
-      "midi": 53,
-      "beat": 34.75,
-      "duration": 0.5
-    },
-    {
-      "midi": 52,
-      "beat": 35,
-      "duration": 0.5
-    },
-    {
-      "midi": 50,
-      "beat": 35.5,
-      "duration": 0.5
-    },
-    {
-      "midi": 48,
-      "beat": 36,
       "duration": 2
     },
     {
-      "midi": 64,
+      "midi": 57,
+      "beat": 36,
+      "duration": 1
+    },
+    {
+      "midi": 60,
       "beat": 36.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 57,
       "beat": 37,
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 60,
       "beat": 37.5,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 57,
       "beat": 38,
-      "duration": 2
+      "duration": 1
+    },
+    {
+      "midi": 60,
+      "beat": 38.5,
+      "duration": 0.5
+    },
+    {
+      "midi": 60,
+      "beat": 39,
+      "duration": 1
     },
     {
       "midi": 57,
+      "beat": 39.5,
+      "duration": 0.5
+    },
+    {
+      "midi": 55,
       "beat": 40,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 40.5,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 41,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 41.5,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 42,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 42.5,
       "duration": 0.5
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 43,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 43.5,
       "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 44,
       "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 44.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 45,
       "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 45.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 46,
       "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 46.5,
       "duration": 0.5
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 47,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 47.5,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 52,
       "beat": 48,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 48.5,
       "duration": 1
     },
     {
-      "midi": 53,
+      "midi": 52,
       "beat": 49,
-      "duration": 1
-    },
-    {
-      "midi": 57,
-      "beat": 49.5,
-      "duration": 1
+      "duration": 0.5
     },
     {
       "midi": 53,
-      "beat": 50,
-      "duration": 1
+      "beat": 49.5,
+      "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 55,
+      "beat": 50,
+      "duration": 0.5
+    },
+    {
+      "midi": 52,
       "beat": 50.5,
       "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 53,
       "beat": 51,
-      "duration": 1
+      "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 55,
       "beat": 51.5,
       "duration": 0.5
     },
     {
-      "midi": 52,
+      "midi": 57,
       "beat": 52,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 60,
       "beat": 52.5,
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 57,
       "beat": 53,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 53,
+      "midi": 60,
       "beat": 53.5,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 57,
       "beat": 54,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 60,
       "beat": 54.5,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 60,
       "beat": 55,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 57,
       "beat": 55.5,
       "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 56,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 56.5,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 57,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 57.5,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 58,
       "duration": 1
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 58.5,
       "duration": 0.5
     },
     {
-      "midi": 60,
+      "midi": 59,
       "beat": 59,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 55,
       "beat": 59.5,
       "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 60,
       "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 60.5,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 61,
       "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 57,
       "beat": 61.5,
-      "duration": 1
+      "duration": 0.5
     },
     {
       "midi": 55,
@@ -578,85 +593,85 @@
     {
       "midi": 59,
       "beat": 62.5,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 59,
+      "midi": 55,
       "beat": 63,
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 59,
       "beat": 63.5,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 48,
       "beat": 64,
       "duration": 1
     },
     {
-      "midi": 57,
-      "beat": 64.5,
-      "duration": 1
-    },
-    {
-      "midi": 53,
+      "midi": 60,
       "beat": 65,
       "duration": 1
     },
     {
-      "midi": 57,
+      "midi": 48,
       "beat": 65.5,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 60,
       "beat": 66,
       "duration": 1
     },
     {
-      "midi": 59,
-      "beat": 66.5,
-      "duration": 1
-    },
-    {
-      "midi": 55,
-      "beat": 67,
-      "duration": 1
-    },
-    {
-      "midi": 59,
-      "beat": 67.5,
-      "duration": 0.5
-    },
-    {
-      "midi": 48,
-      "beat": 68,
-      "duration": 1
-    },
-    {
-      "midi": 60,
-      "beat": 69,
-      "duration": 1
-    },
-    {
-      "midi": 48,
-      "beat": 69.5,
-      "duration": 1
-    },
-    {
-      "midi": 60,
-      "beat": 70,
-      "duration": 1
-    },
-    {
       "midi": 52,
-      "beat": 71,
+      "beat": 67,
       "duration": 0.5
     },
     {
       "midi": 53,
+      "beat": 67.5,
+      "duration": 0.5
+    },
+    {
+      "midi": 55,
+      "beat": 68,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 68.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
+      "beat": 69,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 69.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
+      "beat": 70,
+      "duration": 1
+    },
+    {
+      "midi": 64,
+      "beat": 70.5,
+      "duration": 1
+    },
+    {
+      "midi": 55,
+      "beat": 71,
+      "duration": 0.5
+    },
+    {
+      "midi": 57,
       "beat": 71.5,
       "duration": 0.5
     },
@@ -671,7 +686,7 @@
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 73,
       "duration": 1
     },
@@ -706,17 +721,17 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 76.5,
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 50,
       "beat": 77,
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 77.5,
       "duration": 1
     },
@@ -726,7 +741,7 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 78.5,
       "duration": 1
     },
@@ -746,37 +761,37 @@
       "duration": 1
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 80.5,
       "duration": 1
     },
     {
-      "midi": 50,
+      "midi": 52,
       "beat": 81,
       "duration": 1
     },
     {
-      "midi": 65,
+      "midi": 64,
       "beat": 81.5,
-      "duration": 1
+      "duration": 2
     },
     {
-      "midi": 55,
+      "midi": 48,
       "beat": 82,
-      "duration": 1
+      "duration": 0.5
     },
     {
-      "midi": 65,
+      "midi": 48,
       "beat": 82.5,
-      "duration": 1
+      "duration": 0.5
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 83,
       "duration": 0.5
     },
     {
-      "midi": 57,
+      "midi": 53,
       "beat": 83.5,
       "duration": 0.5
     },
@@ -791,32 +806,32 @@
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 55,
       "beat": 85,
       "duration": 1
     },
     {
       "midi": 64,
       "beat": 85.5,
-      "duration": 2
+      "duration": 1
     },
     {
-      "midi": 48,
+      "midi": 55,
       "beat": 86,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 48,
+      "midi": 64,
       "beat": 86.5,
-      "duration": 0.5
+      "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 55,
       "beat": 87,
       "duration": 0.5
     },
     {
-      "midi": 53,
+      "midi": 57,
       "beat": 87.5,
       "duration": 0.5
     },
@@ -831,7 +846,7 @@
       "duration": 1
     },
     {
-      "midi": 55,
+      "midi": 52,
       "beat": 89,
       "duration": 1
     },
@@ -866,103 +881,63 @@
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 92.5,
       "duration": 1
     },
     {
-      "midi": 52,
+      "midi": 50,
       "beat": 93,
       "duration": 1
     },
     {
-      "midi": 64,
+      "midi": 65,
       "beat": 93.5,
-      "duration": 1
+      "duration": 2
     },
     {
-      "midi": 55,
+      "midi": 53,
       "beat": 94,
       "duration": 1
     },
     {
-      "midi": 64,
-      "beat": 94.5,
-      "duration": 1
-    },
-    {
-      "midi": 55,
-      "beat": 95,
-      "duration": 0.5
-    },
-    {
-      "midi": 57,
-      "beat": 95.5,
-      "duration": 0.5
-    },
-    {
-      "midi": 55,
-      "beat": 96,
-      "duration": 1
-    },
-    {
-      "midi": 65,
-      "beat": 96.5,
-      "duration": 1
-    },
-    {
-      "midi": 50,
-      "beat": 97,
-      "duration": 1
-    },
-    {
-      "midi": 65,
-      "beat": 97.5,
-      "duration": 2
-    },
-    {
       "midi": 53,
-      "beat": 98,
-      "duration": 1
-    },
-    {
-      "midi": 53,
-      "beat": 98.75,
+      "beat": 94.75,
       "duration": 0.5
     },
     {
       "midi": 52,
-      "beat": 99,
+      "beat": 95,
       "duration": 0.5
     },
     {
       "midi": 50,
-      "beat": 99.5,
+      "beat": 95.5,
       "duration": 0.5
     },
     {
       "midi": 48,
-      "beat": 100,
+      "beat": 96,
       "duration": 2
     },
     {
       "midi": 64,
-      "beat": 100.5,
+      "beat": 96.5,
       "duration": 1
     },
     {
       "midi": 55,
-      "beat": 101,
+      "beat": 97,
       "duration": 1
     },
     {
       "midi": 64,
-      "beat": 101.5,
+      "beat": 97.5,
       "duration": 2
     },
     {
       "midi": 60,
-      "beat": 102,
+      "beat": 98,
       "duration": 2
     }
   ]
