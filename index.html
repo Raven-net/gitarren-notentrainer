@@ -65,6 +65,29 @@
           </label>
         </div>
 
+        <div class="control-group" id="endless-key-group" style="display: none;">
+          <label for="endless-key-select">Tonart:</label>
+          <select id="endless-key-select">
+            <optgroup label="Allgemein">
+              <option value="c_major" selected>Nur Stammtöne (ohne Vorzeichen / C-Dur & A-Moll)</option>
+              <option value="all_chromatic">Alle Noten (chromatisch mit ♯ und ♭)</option>
+            </optgroup>
+            <optgroup label="Kreuz-Tonarten (♯)">
+              <option value="g_major">G-Dur / E-Moll (1♯: F♯)</option>
+              <option value="d_major">D-Dur / H-Moll (2♯: F♯, C♯)</option>
+              <option value="a_major">A-Dur / F♯-Moll (3♯: F♯, C♯, G♯)</option>
+              <option value="e_major">E-Dur / C♯-Moll (4♯: F♯, C♯, G♯, D♯)</option>
+              <option value="h_major">H-Dur / G♯-Moll (5♯: F♯, C♯, G♯, D♯, A♯)</option>
+            </optgroup>
+            <optgroup label="B-Tonarten (♭)">
+              <option value="f_major">F-Dur / D-Moll (1♭: B♭)</option>
+              <option value="bb_major">B-Dur / G-Moll (2♭: B♭, E♭)</option>
+              <option value="eb_major">Es-Dur / C-Moll (3♭: B♭, E♭, A♭)</option>
+              <option value="ab_major">As-Dur / F-Moll (4♭: B♭, E♭, A♭, D♭)</option>
+            </optgroup>
+          </select>
+        </div>
+
         <div class="control-group" id="speed-group" style="display: none;">
           <label for="speed-slider">Tempo:</label>
           <input type="range" id="speed-slider" min="0.5" max="3.0" step="0.1" value="1.2">

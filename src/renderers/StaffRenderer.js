@@ -119,11 +119,14 @@ export class StaffRenderer {
       noteColor = '#dc2626'; // Rot für verpasste Note
     }
 
-    // Vorzeichen (z. B. Kreuz #)
+    // Vorzeichen (z. B. Kreuz ♯ oder B ♭)
     if (accidental) {
       this.ctx.fillStyle = noteColor;
-      this.ctx.font = 'bold 20px "Times New Roman", serif';
-      this.ctx.fillText(accidental, x - 18, y + 6);
+      this.ctx.font = 'bold 21px "Times New Roman", "Segoe UI Symbol", serif';
+      const isFlat = accidental === '♭' || accidental === 'b';
+      const glyph = isFlat ? '♭' : '♯';
+      const offsetY = isFlat ? 4 : 6;
+      this.ctx.fillText(glyph, x - 18, y + offsetY);
     }
 
     // Notenkopf (leicht schräg)

@@ -1,4 +1,4 @@
-import { generateFretboardPool } from '../models/Note.js';
+import { generatePoolForKey, KEY_DEFINITIONS } from '../models/KeySignatures.js';
 
 export class EndlessMode {
   constructor(options = {}) {
@@ -7,11 +7,18 @@ export class EndlessMode {
     this.synth = options.synth;
     this.onProgressUpdate = options.onProgressUpdate;
 
-    this.pool = generateFretboardPool(4);
+    this.currentKey = options.currentKey || 'c_major';
+    this.pool = generatePoolForKey(this.currentKey, 4);
     this.activeNotes = [];
     this.score = 0;
     this.speedMultiplier = 1.2;
     this.lastSpawnTime = 0;
+  }
+
+  setKey(keyId) {
+    this.currentKey = keyId;
+    this.pool = generatePoolForKey(keyId, 4);
+    this.reset();
   }
 
   setSpeed(val) {
@@ -96,15 +103,13 @@ export class EndlessMode {
     for (let i = 0; i < this.activeNotes.length; i++) {
       const note = this.activeNotes[i];
       const isTarget = i === 0;
-      const isSharp = [1, 3, 6, 8, 10].includes(note.midi % 12);
-      const accidental = isSharp ? '♯' : null;
 
       this.staffRenderer.drawNote(
         note.x,
         note.diatonicStep,
         1,
         isTarget ? 'target' : 'normal',
-        accidental
+        note.accidental || null
       );
     }
   }

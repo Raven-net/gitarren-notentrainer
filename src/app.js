@@ -36,6 +36,8 @@ class GuitarApp {
     this.speedGroup = document.getElementById('speed-group');
     this.speedSlider = document.getElementById('speed-slider');
     this.speedValDisplay = document.getElementById('speed-val');
+    this.endlessKeyGroup = document.getElementById('endless-key-group');
+    this.endlessKeySelect = document.getElementById('endless-key-select');
     this.bpmControlGroup = document.getElementById('bpm-group');
     this.bpmSlider = document.getElementById('bpm-slider');
     this.bpmValDisplay = document.getElementById('bpm-val');
@@ -198,6 +200,18 @@ class GuitarApp {
       this.speedValDisplay.innerText = spd.toFixed(1) + 'x';
       this.endlessMode.setSpeed(spd);
     });
+
+    if (this.endlessKeySelect) {
+      const savedKey = localStorage.getItem('endless_key_selection') || 'c_major';
+      this.endlessKeySelect.value = savedKey;
+      this.endlessMode.setKey(savedKey);
+
+      this.endlessKeySelect.addEventListener('change', (e) => {
+        const keyId = e.target.value;
+        localStorage.setItem('endless_key_selection', keyId);
+        this.endlessMode.setKey(keyId);
+      });
+    }
 
     this.bpmSlider.addEventListener('input', (e) => {
       const bpm = parseInt(e.target.value);
@@ -632,6 +646,9 @@ class GuitarApp {
     this.songSelectGroup.style.display = (mode === 'practice' || mode === 'rhythm' || mode === 'listen') ? 'flex' : 'none';
     this.bpmControlGroup.style.display = (mode === 'rhythm' || mode === 'listen') ? 'flex' : 'none';
     this.speedGroup.style.display = (mode === 'endless') ? 'flex' : 'none';
+    if (this.endlessKeyGroup) {
+      this.endlessKeyGroup.style.display = (mode === 'endless') ? 'flex' : 'none';
+    }
 
     if (mode === 'editor') {
       this.editorMode.show();
