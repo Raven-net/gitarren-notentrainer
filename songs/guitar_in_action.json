@@ -1,13 +1,14 @@
 {
   "id": "guitar_in_action",
   "title": "Guitar in Action",
-  "artist": "Gitarre",
+  "artist": "Hochweber",
+  "category": "Hochweber",
   "bpm": 120,
   "timeSignature": [
     4,
     4
   ],
-  "description": "Blues- und Rock-Gitarrenstück mit Wechselbass und Melodie",
+  "description": "Blues- und Rock-Gitarrenstück mit Wechselbass und Melodie von Jürg Hochweber",
   "notes": [
     {
       "midi": 69,
