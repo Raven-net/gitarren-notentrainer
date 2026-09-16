@@ -1,4 +1,5 @@
 import { generatePoolForKey, KEY_DEFINITIONS } from '../models/KeySignatures.js';
+import { MelodicPatternGenerator } from '../models/MelodicPatterns.js';
 
 export class EndlessMode {
   constructor(options = {}) {
@@ -8,7 +9,9 @@ export class EndlessMode {
     this.onProgressUpdate = options.onProgressUpdate;
 
     this.currentKey = options.currentKey || 'c_major';
+    this.patternMode = options.patternMode || 'melodic';
     this.pool = generatePoolForKey(this.currentKey, 4);
+    this.patternGenerator = new MelodicPatternGenerator(this.currentKey);
     this.activeNotes = [];
     this.score = 0;
     this.speedMultiplier = 1.2;
@@ -18,6 +21,13 @@ export class EndlessMode {
   setKey(keyId) {
     this.currentKey = keyId;
     this.pool = generatePoolForKey(keyId, 4);
+    this.patternGenerator.setKey(keyId);
+    this.reset();
+  }
+
+  setPatternMode(mode) {
+    this.patternMode = mode; // 'melodic' | 'random'
+    this.patternGenerator.reset();
     this.reset();
   }
 
@@ -29,6 +39,9 @@ export class EndlessMode {
     this.activeNotes = [];
     this.score = 0;
     this.lastSpawnTime = performance.now();
+    if (this.patternGenerator) {
+      this.patternGenerator.reset();
+    }
     this.notifyProgress();
   }
 
@@ -42,7 +55,15 @@ export class EndlessMode {
   }
 
   spawnNote() {
-    const template = this.pool[Math.floor(Math.random() * this.pool.length)];
+    let template = null;
+    if (this.patternMode === 'melodic') {
+      template = this.patternGenerator.getNextNote();
+    }
+    if (!template && this.pool.length > 0) {
+      template = this.pool[Math.floor(Math.random() * this.pool.length)];
+    }
+    if (!template) return;
+
     this.activeNotes.push({
       ...template,
       x: this.staffRenderer.width + 20,

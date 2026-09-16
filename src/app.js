@@ -38,6 +38,7 @@ class GuitarApp {
     this.speedValDisplay = document.getElementById('speed-val');
     this.endlessKeyGroup = document.getElementById('endless-key-group');
     this.endlessKeySelect = document.getElementById('endless-key-select');
+    this.endlessPatternSelect = document.getElementById('endless-pattern-select');
     this.bpmControlGroup = document.getElementById('bpm-group');
     this.bpmSlider = document.getElementById('bpm-slider');
     this.bpmValDisplay = document.getElementById('bpm-val');
@@ -210,6 +211,18 @@ class GuitarApp {
         const keyId = e.target.value;
         localStorage.setItem('endless_key_selection', keyId);
         this.endlessMode.setKey(keyId);
+      });
+    }
+
+    if (this.endlessPatternSelect) {
+      const savedPattern = localStorage.getItem('endless_pattern_selection') || 'melodic';
+      this.endlessPatternSelect.value = savedPattern;
+      this.endlessMode.setPatternMode(savedPattern);
+
+      this.endlessPatternSelect.addEventListener('change', (e) => {
+        const patternMode = e.target.value;
+        localStorage.setItem('endless_pattern_selection', patternMode);
+        this.endlessMode.setPatternMode(patternMode);
       });
     }
 
