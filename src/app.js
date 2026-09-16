@@ -9,6 +9,7 @@ import { PracticeMode } from './modes/PracticeMode.js';
 import { RhythmGameMode } from './modes/RhythmGameMode.js';
 import { EndlessMode } from './modes/EndlessMode.js';
 import { SongEditorMode } from './modes/SongEditorMode.js';
+import { ListenMode } from './modes/ListenMode.js';
 import { MidiImporter } from './midi/MidiImporter.js';
 
 class GuitarApp {
@@ -113,6 +114,18 @@ class GuitarApp {
       onManageSongs: () => this.openManageSongsModal()
     });
 
+    this.listenMode = new ListenMode({
+      staffRenderer: this.staffRenderer,
+      fretboardRenderer: this.fretboardRenderer,
+      synth: this.synth,
+      audioEngine: this.audioEngine,
+      onProgressUpdate: (p) => { this.scoreDisplay.innerText = p.scoreText; },
+      onNotePlay: (noteName) => { this.pitchDisplay.innerText = noteName; },
+      onComplete: () => {
+        this.updateRhythmButtonState(false);
+      }
+    });
+
     this.lastFrameTime = performance.now();
     this.initUI();
     this.setMode('practice');
@@ -190,24 +203,34 @@ class GuitarApp {
       const bpm = parseInt(e.target.value);
       this.bpmValDisplay.innerText = `${bpm} BPM`;
       this.rhythmMode.setBpm(bpm);
+      this.listenMode.setBpm(bpm);
     });
 
     this.metronomeToggle.addEventListener('change', (e) => {
       this.rhythmMode.setMetronome(e.target.checked);
+      this.listenMode.setMetronome(e.target.checked);
     });
 
     if (this.rhythmStartBtn) {
       this.rhythmStartBtn.addEventListener('click', () => {
-        this.toggleRhythmPlayback();
+        if (this.currentModeName === 'rhythm') {
+          this.toggleRhythmPlayback();
+        } else if (this.currentModeName === 'listen') {
+          this.toggleListenPlayback();
+        }
       });
     }
 
-    // Leertaste zum Starten/Stoppen im Rhythmus-Modus
+    // Leertaste zum Starten/Stoppen im Rhythmus- und Anhören-Modus
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && this.currentModeName === 'rhythm') {
+      if (e.code === 'Space' && (this.currentModeName === 'rhythm' || this.currentModeName === 'listen')) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
           e.preventDefault();
-          this.toggleRhythmPlayback();
+          if (this.currentModeName === 'rhythm') {
+            this.toggleRhythmPlayback();
+          } else if (this.currentModeName === 'listen') {
+            this.toggleListenPlayback();
+          }
         }
       }
     });
@@ -220,6 +243,8 @@ class GuitarApp {
       this.loadCurrentSongIntoMode();
       if (this.currentModeName === 'rhythm') {
         this.toggleRhythmPlayback();
+      } else if (this.currentModeName === 'listen') {
+        this.toggleListenPlayback();
       }
     });
 
@@ -524,6 +549,22 @@ class GuitarApp {
         this.updateCustomSongButtons();
       });
 
+      const listenBtn = document.createElement('button');
+      listenBtn.className = 'btn btn-sm';
+      listenBtn.innerText = '🎧 Anhören';
+      listenBtn.title = `"${s.title}" im Anhören-Modus abspielen`;
+      listenBtn.addEventListener('click', async () => {
+        this.closeManageSongsModal();
+        this.currentSong = s;
+        this.songSelect.value = s.id;
+        this.bpmSlider.value = s.bpm || 100;
+        this.bpmValDisplay.innerText = `${s.bpm || 100} BPM`;
+        this.setMode('listen');
+        this.modeSelect.value = 'listen';
+        this.updateCustomSongButtons();
+        await this.toggleListenPlayback();
+      });
+
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-sm';
       editBtn.innerText = '✏️ Editor';
@@ -546,6 +587,7 @@ class GuitarApp {
       });
 
       actions.appendChild(playBtn);
+      actions.appendChild(listenBtn);
       actions.appendChild(editBtn);
       actions.appendChild(delBtn);
 
@@ -580,14 +622,15 @@ class GuitarApp {
   setMode(mode) {
     this.currentModeName = mode;
     this.rhythmMode.stop();
+    this.listenMode.stop();
     this.updateRhythmButtonState(false);
     this.editorMode.hide();
     this.applyFretboardVisibility();
     this.updateCustomSongButtons();
 
     // Sichtbarkeit der Steuerelemente steuern
-    this.songSelectGroup.style.display = (mode === 'practice' || mode === 'rhythm') ? 'flex' : 'none';
-    this.bpmControlGroup.style.display = (mode === 'rhythm') ? 'flex' : 'none';
+    this.songSelectGroup.style.display = (mode === 'practice' || mode === 'rhythm' || mode === 'listen') ? 'flex' : 'none';
+    this.bpmControlGroup.style.display = (mode === 'rhythm' || mode === 'listen') ? 'flex' : 'none';
     this.speedGroup.style.display = (mode === 'endless') ? 'flex' : 'none';
 
     if (mode === 'editor') {
@@ -602,6 +645,11 @@ class GuitarApp {
 
   toggleRhythmPlayback() {
     const isPlaying = this.rhythmMode.togglePlay();
+    this.updateRhythmButtonState(isPlaying);
+  }
+
+  async toggleListenPlayback() {
+    const isPlaying = await this.listenMode.togglePlay();
     this.updateRhythmButtonState(isPlaying);
   }
 
@@ -624,6 +672,10 @@ class GuitarApp {
       this.updateRhythmButtonState(false);
       const bpm = parseInt(this.bpmSlider.value) || this.currentSong.bpm || 100;
       this.rhythmMode.loadSong(this.currentSong, bpm);
+    } else if (this.currentModeName === 'listen') {
+      this.updateRhythmButtonState(false);
+      const bpm = parseInt(this.bpmSlider.value) || this.currentSong.bpm || 100;
+      this.listenMode.loadSong(this.currentSong, bpm);
     }
   }
 
@@ -639,6 +691,11 @@ class GuitarApp {
       this.practiceMode.evaluateNote(midi, btn);
     } else if (this.currentModeName === 'rhythm') {
       this.rhythmMode.evaluateNote(midi, btn);
+    } else if (this.currentModeName === 'listen') {
+      const noteObj = this.listenMode?.currentSong?.notes?.find(n => n.midi === midi);
+      const freq = noteObj?.freq || (440 * Math.pow(2, (midi - 69) / 12));
+      this.synth.playTone(freq, true);
+      this.fretboardRenderer.highlightMidi(midi, 'correct-flash');
     } else if (this.currentModeName === 'endless') {
       this.endlessMode.evaluateNote(midi, btn);
     }
@@ -758,6 +815,9 @@ class GuitarApp {
       } else if (this.currentModeName === 'rhythm') {
         this.rhythmMode.update(dt);
         this.rhythmMode.render();
+      } else if (this.currentModeName === 'listen') {
+        this.listenMode.update(dt);
+        this.listenMode.render();
       } else if (this.currentModeName === 'endless') {
         this.endlessMode.update(dt);
         this.endlessMode.render();
