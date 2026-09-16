@@ -1,0 +1,637 @@
+{
+  "id": "durchsichtig",
+  "title": "Durchsichtig",
+  "artist": "Hochweber",
+  "category": "Hochweber",
+  "bpm": 100,
+  "timeSignature": [
+    4,
+    4
+  ],
+  "description": "Melodisches Gitarrenstück von Jürg Hochweber",
+  "notes": [
+    {
+      "midi": 45,
+      "beat": 0,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 57,
+      "beat": 0.5,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 1,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 1.5,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 2,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 59,
+      "beat": 3,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 4,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 4.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 5.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 6,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 62,
+      "beat": 7,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 45,
+      "beat": 8,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 8.5,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 9,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 9.5,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 10,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 11,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 40,
+      "beat": 12,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "beat": 12.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 13,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 13.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 14,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 59,
+      "beat": 15,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 16,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 57,
+      "beat": 16.5,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 17,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 17.5,
+      "duration": 0.5,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 57,
+      "beat": 18,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 59,
+      "beat": 19,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 20,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 20.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 21,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 21.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 22,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 62,
+      "beat": 23,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 40,
+      "beat": 24,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 24.5,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 64,
+      "beat": 25,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 65,
+      "beat": 25.5,
+      "duration": 0.5,
+      "string": 0,
+      "fret": 1
+    },
+    {
+      "midi": 64,
+      "beat": 26,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 27,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 57,
+      "beat": 28,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 45,
+      "beat": 29,
+      "duration": 1,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 30,
+      "duration": 2,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 40,
+      "beat": 32,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "beat": 32.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 33,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 33.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 34,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 59,
+      "beat": 35,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 36,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 36.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 37,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 37.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 38,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 57,
+      "beat": 39,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 40,
+      "beat": 40,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 40.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 41,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 41.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 42,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 62,
+      "beat": 43,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 64,
+      "beat": 44,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 65,
+      "beat": 45,
+      "duration": 1,
+      "string": 0,
+      "fret": 1
+    },
+    {
+      "midi": 67,
+      "beat": 46,
+      "duration": 1,
+      "string": 0,
+      "fret": 3
+    },
+    {
+      "midi": 65,
+      "beat": 47,
+      "duration": 1,
+      "string": 0,
+      "fret": 1
+    },
+    {
+      "midi": 40,
+      "beat": 48,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "beat": 48.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 49,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 49.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 62,
+      "beat": 50,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 59,
+      "beat": 51,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 45,
+      "beat": 52,
+      "duration": 0.5,
+      "string": 4,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 52.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 53,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 53.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 60,
+      "beat": 54,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 57,
+      "beat": 55,
+      "duration": 1,
+      "string": 2,
+      "fret": 2
+    },
+    {
+      "midi": 40,
+      "beat": 56,
+      "duration": 0.5,
+      "string": 5,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 56.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 57,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 59,
+      "beat": 57.5,
+      "duration": 0.5,
+      "string": 1,
+      "fret": 0
+    },
+    {
+      "midi": 60,
+      "beat": 58,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 62,
+      "beat": 59,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 64,
+      "beat": 60,
+      "duration": 1,
+      "string": 0,
+      "fret": 0
+    },
+    {
+      "midi": 62,
+      "beat": 61,
+      "duration": 1,
+      "string": 1,
+      "fret": 3
+    },
+    {
+      "midi": 60,
+      "beat": 62,
+      "duration": 1,
+      "string": 1,
+      "fret": 1
+    },
+    {
+      "midi": 59,
+      "beat": 63,
+      "duration": 1,
+      "string": 1,
+      "fret": 0
+    }
+  ]
+}

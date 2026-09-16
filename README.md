@@ -37,6 +37,9 @@ Gitarren_Noten_Lernen/
 │   └── modal.css              # Auswertungs- & Statistikdialog
 ├── songs/                     # Auslagerung aller Songdateien
 │   ├── songRegistry.js        # Zentraler Katalog & Fallback
+│   ├── guitar_in_action.json       # Jürg Hochweber
+│   ├── durchsichtig.json           # Jürg Hochweber
+│   ├── fingerspiel.json            # Jürg Hochweber
 │   ├── smoke_on_the_water.json
 │   ├── seven_nation_army.json
 │   ├── nothing_else_matters.json
