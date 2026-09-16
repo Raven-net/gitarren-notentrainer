@@ -48,7 +48,8 @@ Gitarren_Noten_Lernen/
 │   ├── ode_an_die_freude.json
 │   ├── frere_jacques.json
 │   ├── haenschen_klein.json
-│   └── old_mcdonald.json
+│   ├── old_mcdonald.json
+│   └── drei_saiten_abenteuer.json  # Anfänger-Lernstück (Stammnoten Saite 1-3)
 └── src/
     ├── app.js                 # Hauptcontroller & Event-Dispatcher
     ├── audio/
