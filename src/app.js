@@ -47,7 +47,11 @@ class GuitarApp {
     this.irigBtn = document.getElementById('irig-btn');
     this.micBtn = document.getElementById('mic-btn');
 
-    // Modal
+    // Liederverwaltung & Lösch-Buttons
+    this.deleteSongBtn = document.getElementById('delete-song-btn');
+    this.manageSongsBtn = document.getElementById('manage-songs-btn');
+
+    // Auswertungs-Modal
     this.modalBackdrop = document.getElementById('eval-modal');
     this.modalScorePercent = document.getElementById('modal-score-percent');
     this.modalStatHits = document.getElementById('modal-stat-hits');
@@ -55,6 +59,12 @@ class GuitarApp {
     this.modalStatStreak = document.getElementById('modal-stat-streak');
     this.modalRestartBtn = document.getElementById('modal-restart-btn');
     this.modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // Liederverwaltungs-Modal
+    this.manageModalBackdrop = document.getElementById('custom-songs-modal');
+    this.manageModalList = document.getElementById('custom-songs-list');
+    this.manageModalDeleteAllBtn = document.getElementById('modal-delete-all-btn');
+    this.manageModalCloseBtn = document.getElementById('modal-manage-close-btn');
 
     // Audio & Engine
     this.audioEngine = new AudioEngine();
@@ -99,7 +109,8 @@ class GuitarApp {
       fretboardRenderer: this.fretboardRenderer,
       synth: this.synth,
       containerEl: this.editorContainerEl,
-      onSongSaved: (song) => this.registerNewSong(song)
+      onSongSaved: (song) => this.registerNewSong(song),
+      onManageSongs: () => this.openManageSongsModal()
     });
 
     this.lastFrameTime = performance.now();
@@ -122,8 +133,43 @@ class GuitarApp {
         this.bpmSlider.value = selected.bpm;
         this.bpmValDisplay.innerText = `${selected.bpm} BPM`;
         this.loadCurrentSongIntoMode();
+        this.updateCustomSongButtons();
       }
     });
+
+    if (this.deleteSongBtn) {
+      this.deleteSongBtn.addEventListener('click', () => {
+        if (this.currentSong) {
+          this.deleteCustomSong(this.currentSong.id);
+        }
+      });
+    }
+
+    if (this.manageSongsBtn) {
+      this.manageSongsBtn.addEventListener('click', () => {
+        this.openManageSongsModal();
+      });
+    }
+
+    if (this.manageModalCloseBtn) {
+      this.manageModalCloseBtn.addEventListener('click', () => {
+        this.closeManageSongsModal();
+      });
+    }
+
+    if (this.manageModalDeleteAllBtn) {
+      this.manageModalDeleteAllBtn.addEventListener('click', () => {
+        this.deleteAllCustomSongs();
+      });
+    }
+
+    if (this.manageModalBackdrop) {
+      this.manageModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.manageModalBackdrop) {
+          this.closeManageSongsModal();
+        }
+      });
+    }
 
     if (this.mainFileInput) {
       this.mainFileInput.addEventListener('change', async (e) => {
@@ -199,6 +245,8 @@ class GuitarApp {
     // Drag & Drop für .json und .mid Dateien
     window.addEventListener('dragover', (e) => e.preventDefault());
     window.addEventListener('drop', (e) => this.handleFileDrop(e));
+
+    this.updateCustomSongButtons();
   }
 
   populateSongSelect() {
@@ -239,7 +287,9 @@ class GuitarApp {
 
         list.forEach(songData => {
           if (!this.songs.some(s => s.id === songData.id)) {
-            this.songs.push(new Song(songData));
+            const song = new Song(songData);
+            song.isCustom = true;
+            this.songs.push(song);
           }
         });
       }
@@ -261,6 +311,7 @@ class GuitarApp {
   }
 
   registerNewSong(song) {
+    song.isCustom = true;
     this.saveCustomSongToStorage(song);
     const existingIdx = this.songs.findIndex(s => s.id === song.id);
     if (existingIdx >= 0) {
@@ -271,7 +322,238 @@ class GuitarApp {
     this.populateSongSelect();
     this.songSelect.value = song.id;
     this.currentSong = song;
+    this.updateCustomSongButtons();
     this.setMode('practice');
+  }
+
+  isCustomSong(songOrId) {
+    if (!songOrId) return false;
+    const songId = typeof songOrId === 'string' ? songOrId : songOrId.id;
+    const songObj = typeof songOrId === 'object' ? songOrId : this.songs.find(s => s.id === songId);
+    if (songObj && songObj.isCustom) return true;
+
+    // Gegen vorinstallierte Lieder abgleichen
+    if (BUILTIN_SONGS.some(b => b.id === songId)) return false;
+
+    // Prüfen, ob Song im localStorage hinterlegt ist
+    try {
+      const saved = localStorage.getItem('custom_guitar_songs');
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (list.some(s => s.id === songId)) return true;
+      }
+    } catch (e) {}
+
+    return Boolean(songObj && songObj.isCustom);
+  }
+
+  getCustomSongsList() {
+    return this.songs.filter(s => this.isCustomSong(s));
+  }
+
+  updateCustomSongButtons() {
+    const isCustom = this.currentSong && this.isCustomSong(this.currentSong);
+    if (this.deleteSongBtn) {
+      this.deleteSongBtn.style.display = isCustom ? 'inline-flex' : 'none';
+      if (isCustom) {
+        this.deleteSongBtn.title = `Eigenes Lied "${this.currentSong.title}" aus dem Browser löschen`;
+      }
+    }
+
+    if (this.manageSongsBtn) {
+      const customCount = this.getCustomSongsList().length;
+      this.manageSongsBtn.innerHTML = customCount > 0
+        ? `📁 Eigene Lieder <span style="font-size:0.75rem; background:#2563eb; color:#fff; padding:1px 6px; border-radius:10px; margin-left:4px; font-weight:700;">${customCount}</span>`
+        : `📁 Eigene Lieder`;
+    }
+  }
+
+  deleteCustomSong(songId, skipConfirm = false) {
+    const songIndex = this.songs.findIndex(s => s.id === songId);
+    if (songIndex === -1) return;
+
+    const song = this.songs[songIndex];
+    if (!this.isCustomSong(song)) {
+      alert("Vorinstallierte Lieder können nicht gelöscht werden.");
+      return;
+    }
+
+    if (!skipConfirm) {
+      const confirmed = confirm(`Möchtest du das eigene Lied "${song.title}" wirklich aus deinem Browser löschen?`);
+      if (!confirmed) return;
+    }
+
+    // Aus localStorage entfernen
+    try {
+      const saved = localStorage.getItem('custom_guitar_songs');
+      if (saved) {
+        let list = JSON.parse(saved);
+        list = list.filter(s => s.id !== songId);
+        localStorage.setItem('custom_guitar_songs', JSON.stringify(list));
+      }
+    } catch (e) {
+      console.error("Fehler beim Löschen des Songs aus localStorage:", e);
+    }
+
+    // Aus interner Liste entfernen
+    this.songs.splice(songIndex, 1);
+
+    // Falls das aktuelle Lied gelöscht wurde, auf Standardlied zurückfallen
+    if (this.currentSong && this.currentSong.id === songId) {
+      const gia = this.songs.find(s => s.id === 'guitar_in_action');
+      this.currentSong = gia || this.songs[0];
+    }
+
+    this.populateSongSelect();
+    if (this.currentSong) {
+      this.songSelect.value = this.currentSong.id;
+      this.bpmSlider.value = this.currentSong.bpm || 100;
+      this.bpmValDisplay.innerText = `${this.currentSong.bpm || 100} BPM`;
+      this.loadCurrentSongIntoMode();
+    }
+    this.updateCustomSongButtons();
+
+    // Modal aktualisieren, falls geöffnet
+    if (this.manageModalBackdrop && this.manageModalBackdrop.classList.contains('open')) {
+      this.renderCustomSongsModal();
+    }
+  }
+
+  deleteAllCustomSongs() {
+    const customSongs = this.getCustomSongsList();
+    if (customSongs.length === 0) return;
+
+    const confirmed = confirm(`Möchtest du wirklich ALLE (${customSongs.length}) selbst im Browser gespeicherten Lieder unwiderruflich löschen?`);
+    if (!confirmed) return;
+
+    try {
+      localStorage.removeItem('custom_guitar_songs');
+    } catch (e) {
+      console.error("Fehler beim Löschen aller eigenen Songs:", e);
+    }
+
+    this.songs = this.songs.filter(s => !this.isCustomSong(s));
+    const gia = this.songs.find(s => s.id === 'guitar_in_action');
+    this.currentSong = gia || this.songs[0];
+
+    this.populateSongSelect();
+    if (this.currentSong) {
+      this.songSelect.value = this.currentSong.id;
+      this.bpmSlider.value = this.currentSong.bpm || 100;
+      this.bpmValDisplay.innerText = `${this.currentSong.bpm || 100} BPM`;
+      this.loadCurrentSongIntoMode();
+    }
+    this.updateCustomSongButtons();
+    this.renderCustomSongsModal();
+  }
+
+  openManageSongsModal() {
+    this.renderCustomSongsModal();
+    if (this.manageModalBackdrop) {
+      this.manageModalBackdrop.classList.add('open');
+    }
+  }
+
+  closeManageSongsModal() {
+    if (this.manageModalBackdrop) {
+      this.manageModalBackdrop.classList.remove('open');
+    }
+  }
+
+  renderCustomSongsModal() {
+    if (!this.manageModalList) return;
+    const customSongs = this.getCustomSongsList();
+
+    if (customSongs.length === 0) {
+      this.manageModalList.innerHTML = `
+        <div class="custom-songs-empty">
+          <p><strong>Keine eigenen Lieder gespeichert</strong></p>
+          <p style="margin-top:6px; font-size:0.82rem;">
+            Du kannst im <em>✏️ Song-Editor</em> neue Lieder komponieren oder über <em>📂 Datei öffnen</em> eigene MIDI- oder JSON-Dateien laden.
+          </p>
+        </div>
+      `;
+      if (this.manageModalDeleteAllBtn) {
+        this.manageModalDeleteAllBtn.style.display = 'none';
+      }
+      return;
+    }
+
+    if (this.manageModalDeleteAllBtn) {
+      this.manageModalDeleteAllBtn.style.display = 'inline-flex';
+    }
+
+    this.manageModalList.innerHTML = '';
+    customSongs.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'custom-song-item';
+
+      const info = document.createElement('div');
+      info.className = 'custom-song-info';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'custom-song-title';
+      titleEl.innerText = s.title;
+
+      const metaEl = document.createElement('div');
+      metaEl.className = 'custom-song-meta';
+      metaEl.innerHTML = `
+        <span>👤 ${s.artist || 'Unbekannt'}</span>
+        <span class="custom-song-badge">🎵 ${(s.notes || []).length} Noten</span>
+        <span class="custom-song-badge">⏱ ${s.bpm || 100} BPM</span>
+      `;
+
+      info.appendChild(titleEl);
+      info.appendChild(metaEl);
+
+      const actions = document.createElement('div');
+      actions.className = 'custom-song-actions';
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'btn btn-primary btn-sm';
+      playBtn.innerText = '🎯 Üben';
+      playBtn.title = `"${s.title}" im Übungsmodus öffnen`;
+      playBtn.addEventListener('click', () => {
+        this.closeManageSongsModal();
+        this.currentSong = s;
+        this.songSelect.value = s.id;
+        this.bpmSlider.value = s.bpm || 100;
+        this.bpmValDisplay.innerText = `${s.bpm || 100} BPM`;
+        this.setMode('practice');
+        this.modeSelect.value = 'practice';
+        this.updateCustomSongButtons();
+      });
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-sm';
+      editBtn.innerText = '✏️ Editor';
+      editBtn.title = `"${s.title}" im Song-Editor bearbeiten`;
+      editBtn.addEventListener('click', () => {
+        this.closeManageSongsModal();
+        this.currentSong = s;
+        this.setMode('editor');
+        this.modeSelect.value = 'editor';
+        this.editorMode.loadSongData(s.toJSON());
+        this.updateCustomSongButtons();
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-danger btn-sm';
+      delBtn.innerText = '🗑️ Löschen';
+      delBtn.title = `"${s.title}" aus dem Browser löschen`;
+      delBtn.addEventListener('click', () => {
+        this.deleteCustomSong(s.id);
+      });
+
+      actions.appendChild(playBtn);
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+
+      item.appendChild(info);
+      item.appendChild(actions);
+
+      this.manageModalList.appendChild(item);
+    });
   }
 
   applyFretboardVisibility() {
@@ -301,6 +583,7 @@ class GuitarApp {
     this.updateRhythmButtonState(false);
     this.editorMode.hide();
     this.applyFretboardVisibility();
+    this.updateCustomSongButtons();
 
     // Sichtbarkeit der Steuerelemente steuern
     this.songSelectGroup.style.display = (mode === 'practice' || mode === 'rhythm') ? 'flex' : 'none';

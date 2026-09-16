@@ -39,6 +39,12 @@
         <div class="control-group" id="song-select-group">
           <label for="song-select">Lied:</label>
           <select id="song-select"></select>
+          <button id="delete-song-btn" class="btn btn-danger" style="display: none; padding: 5px 10px; font-size: 0.82rem;" title="Aktuelles eigenes Lied aus dem Browser löschen">
+            🗑️ Löschen
+          </button>
+          <button id="manage-songs-btn" class="btn" style="padding: 5px 10px; font-size: 0.82rem;" title="Gespeicherte eigene Lieder verwalten und löschen">
+            📁 Eigene Lieder
+          </button>
           <label class="btn" style="cursor:pointer; padding: 5px 10px; font-size: 0.82rem;" title="Song- (.json) oder MIDI-Datei (.mid) öffnen">
             📂 Datei öffnen
             <input type="file" id="main-file-input" accept=".json,.mid,.midi,.MID,.MIDI" style="display:none;">
@@ -147,6 +153,27 @@
       <div class="modal-actions">
         <button id="modal-restart-btn" class="btn btn-primary">Erneut spielen</button>
         <button id="modal-close-btn" class="btn">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal zur Verwaltung eigener im Browser gespeicherter Lieder -->
+  <div id="custom-songs-modal" class="modal-backdrop">
+    <div class="modal-content modal-content-wide">
+      <h2 class="modal-title">📁 Gespeicherte eigene Lieder</h2>
+      <p class="modal-subtitle" style="margin-top:-10px; font-size:0.85rem; color:var(--text-muted);">
+        Im Browser gespeicherte Lieder (localStorage) verwalten oder löschen
+      </p>
+
+      <div id="custom-songs-list" class="custom-songs-list">
+        <!-- Wird dynamisch mit Liedern befüllt -->
+      </div>
+
+      <div class="modal-actions" style="justify-content: space-between;">
+        <button id="modal-delete-all-btn" class="btn btn-danger" style="display: none;">
+          🗑️ Alle eigenen Lieder löschen
+        </button>
+        <button id="modal-manage-close-btn" class="btn">Schließen</button>
       </div>
     </div>
   </div>

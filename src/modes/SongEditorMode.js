@@ -9,6 +9,7 @@ export class SongEditorMode {
     this.synth = options.synth;
     this.containerEl = options.containerEl;
     this.onSongSaved = options.onSongSaved;
+    this.onManageSongs = options.onManageSongs;
 
     this.currentDuration = 1; // Standard: Viertelnote
     this.songTitle = "Mein neues Gitarrenstück";
@@ -53,6 +54,7 @@ export class SongEditorMode {
       <div class="editor-actions">
         <button id="editor-play-btn" class="btn btn-success">▶ Playback</button>
         <button id="editor-save-btn" class="btn btn-primary" title="Speichert das Lied direkt in der Liederliste deines Browsers">⭐ In Liederliste speichern</button>
+        <button id="editor-manage-btn" class="btn" title="Gespeicherte eigene Lieder öffnen oder löschen">📁 Eigene Lieder</button>
         <button id="editor-export-btn" class="btn">💾 Als JSON exportieren</button>
         <button id="editor-undo-btn" class="btn">↶ Letzte Note löschen</button>
         <button id="editor-clear-btn" class="btn btn-danger">Alle löschen</button>
@@ -107,6 +109,13 @@ export class SongEditorMode {
       saveBtn.addEventListener('click', () => this.saveSongToList());
     }
 
+    const manageBtn = this.containerEl.querySelector('#editor-manage-btn');
+    if (manageBtn) {
+      manageBtn.addEventListener('click', () => {
+        if (this.onManageSongs) this.onManageSongs();
+      });
+    }
+
     const exportBtn = this.containerEl.querySelector('#editor-export-btn');
     exportBtn.addEventListener('click', () => this.exportSongJSON());
 
@@ -128,8 +137,9 @@ export class SongEditorMode {
       bpm: this.songBpm || 100,
       timeSignature: [4, 4],
       description: "Erstellt mit dem integrierten Gitarren-Song-Editor",
-      notes: this.notes.map(n => ({
+      notes: this.notes.map((n, idx) => ({
         midi: n.midi,
+        beat: n.beat !== undefined ? n.beat : idx,
         duration: n.duration,
         ...(n.string !== undefined && n.string !== null ? { string: n.string } : {}),
         ...(n.fret !== undefined && n.fret !== null ? { fret: n.fret } : {})
