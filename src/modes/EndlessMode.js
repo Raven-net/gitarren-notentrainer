@@ -72,16 +72,9 @@ export class EndlessMode {
     }
     if (!template && this.pool.length > 0) {
       const baseTemplate = this.pool[Math.floor(Math.random() * this.pool.length)];
-      const rand = Math.random();
-      let duration = 1;
-      if (rand < 0.10) duration = 0.5;      // 10% Achtel
-      else if (rand < 0.70) duration = 1;  // 60% Viertel
-      else if (rand < 0.93) duration = 2;  // 23% Halbe
-      else duration = 4;                   // 7% Ganze
-
       template = {
         ...baseTemplate,
-        duration: duration
+        duration: 1 // Im Zufallsmodus (Einzeltöne) immer reine Viertelnoten
       };
     }
     if (!template) return;
