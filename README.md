@@ -40,6 +40,8 @@ Gitarren_Noten_Lernen/
 │   ├── guitar_in_action.json       # Jürg Hochweber
 │   ├── durchsichtig.json           # Jürg Hochweber
 │   ├── fingerspiel.json            # Jürg Hochweber
+│   ├── embryorock.json             # Jürg Hochweber
+│   ├── unter_uns.json              # Jürg Hochweber
 │   ├── smoke_on_the_water.json
 │   ├── seven_nation_army.json
 │   ├── nothing_else_matters.json
