@@ -13,7 +13,8 @@ export class RhythmGameMode {
 
     this.isPlaying = false;
     this.songTime = 0; // Verstrichene Zeit in Sekunden
-    this.startDelay = 2.0; // 2 Sekunden Einzähler / Vorlauf
+    this.countInBeats = 4; // Fester vorgeschalteter 4/4-Takt zum Einzählen (1, 2, 3, 4)
+    this.startDelay = this.getStartDelay();
     this.hitWindowSeconds = 0.22; // +/- 220ms Trefferfenster
 
     this.notesState = []; // [{ note, targetTime, state: 'pending'|'hit'|'miss' }]
@@ -22,12 +23,22 @@ export class RhythmGameMode {
     this.streak = 0;
     this.maxStreak = 0;
 
-    this.lastBeatNumber = -1;
+    this.lastBeatNumber = null;
     this.metronomeEnabled = true;
+  }
+
+  getCountInBeats() {
+    return 4;
+  }
+
+  getStartDelay() {
+    const secondsPerBeat = 60 / (this.bpm || 100);
+    return this.getCountInBeats() * secondsPerBeat;
   }
 
   setBpm(bpm) {
     this.bpm = bpm;
+    this.startDelay = this.getStartDelay();
     if (!this.isPlaying && this.currentSong) {
       this.prepareTimeline();
     }
@@ -52,6 +63,7 @@ export class RhythmGameMode {
     }
 
     const secondsPerBeat = 60 / this.bpm;
+    this.startDelay = this.getStartDelay();
 
     this.notesState = this.currentSong.notes.map((n, idx) => {
       const noteStartTime = (n.beat !== undefined ? n.beat : 0) * secondsPerBeat;
@@ -75,13 +87,14 @@ export class RhythmGameMode {
   start() {
     if (!this.currentSong) return;
     this.prepareTimeline();
+    this.startDelay = this.getStartDelay();
     this.songTime = -this.startDelay;
     this.isPlaying = true;
     this.hits = 0;
     this.misses = 0;
     this.streak = 0;
     this.maxStreak = 0;
-    this.lastBeatNumber = -1;
+    this.lastBeatNumber = null;
     this.notifyProgress();
   }
 
@@ -175,11 +188,12 @@ export class RhythmGameMode {
 
     // Metronom-Klick berechnen
     const secondsPerBeat = 60 / this.bpm;
-    if (this.songTime >= -this.startDelay) {
+    if (this.songTime >= -this.startDelay - 0.05) {
       const currentBeat = Math.floor(this.songTime / secondsPerBeat);
       if (currentBeat !== this.lastBeatNumber) {
         this.lastBeatNumber = currentBeat;
-        if (this.metronomeEnabled) {
+        // Beim vorgeschalteten Einzähler (songTime < 0) immer hörbar klicken, danach nach Einstellung
+        if (this.songTime < 0 || this.metronomeEnabled) {
           const isMeasureStart = ((currentBeat % 4) + 4) % 4 === 0;
           this.synth.playClick(isMeasureStart);
         }
@@ -246,9 +260,9 @@ export class RhythmGameMode {
     const secondsPerBeat = 60 / this.bpm;
     const pixelsPerSecond = (this.pixelsPerBeat / secondsPerBeat);
 
-    // Takte zeichnen
+    // Takte zeichnen (inklusive vorgeschaltetem 4/4-Einzähl-Takt bei -4)
     const totalBeats = this.currentSong.getTotalBeats();
-    for (let b = 0; b <= totalBeats + 4; b += 4) {
+    for (let b = -4; b <= totalBeats + 4; b += 4) {
       const beatTime = b * secondsPerBeat;
       const barX = this.hitLineX + (beatTime - this.songTime) * pixelsPerSecond;
       this.staffRenderer.drawBarLine(barX);
@@ -273,15 +287,36 @@ export class RhythmGameMode {
       }
     }
 
-    // Einzähler-Hinweis auf Canvas anzeigen, wenn im Vorlauf
+    // Einzähler-Hinweis auf Canvas anzeigen, wenn im Vorlauf (1 bis 4)
     if (this.isPlaying && this.songTime < 0) {
-      const count = Math.ceil(-this.songTime);
-      this.staffRenderer.ctx.save();
-      this.staffRenderer.ctx.fillStyle = 'rgba(234, 88, 12, 0.9)';
-      this.staffRenderer.ctx.font = 'bold 36px system-ui, sans-serif';
-      this.staffRenderer.ctx.textAlign = 'center';
-      this.staffRenderer.ctx.fillText(`Start in: ${count}`, this.staffRenderer.width / 2, 50);
-      this.staffRenderer.ctx.restore();
+      const currentBeat = Math.floor(this.songTime / secondsPerBeat);
+      const count = Math.min(4, Math.max(1, currentBeat + 5));
+      const ctx = this.staffRenderer.ctx;
+
+      ctx.save();
+      const badgeWidth = 260;
+      const badgeHeight = 56;
+      const badgeX = (this.staffRenderer.width - badgeWidth) / 2;
+      const badgeY = 20;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 12);
+        ctx.fill();
+        ctx.strokeStyle = count === 1 ? 'rgba(234, 179, 8, 0.9)' : 'rgba(56, 189, 248, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else {
+        ctx.fillRect(badgeX, badgeY, badgeWidth, badgeHeight);
+      }
+
+      ctx.fillStyle = count === 1 ? '#facc15' : '#38bdf8';
+      ctx.font = 'bold 30px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`Einzählen: ${count}`, this.staffRenderer.width / 2, badgeY + badgeHeight / 2);
+      ctx.restore();
     } else if (!this.isPlaying) {
       this.staffRenderer.ctx.save();
       this.staffRenderer.ctx.fillStyle = 'rgba(59, 130, 246, 0.85)';
