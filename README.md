@@ -54,7 +54,8 @@ Gitarren_Noten_Lernen/
 │   ├── frere_jacques.json
 │   ├── haenschen_klein.json
 │   ├── old_mcdonald.json
-│   └── drei_saiten_abenteuer.json  # Anfänger-Lernstück (Stammnoten Saite 1-3)
+│   ├── drei_saiten_abenteuer.json  # Anfänger-Lernstück (Stammnoten Saite 1-3)
+│   └── Martens_Rock.json           # Lyudmila (Kategorie: Marten)
 └── src/
     ├── app.js                 # Hauptcontroller & Event-Dispatcher
     ├── audio/
