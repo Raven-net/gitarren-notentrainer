@@ -14,6 +14,7 @@ export class SongEditorMode {
     this.currentDuration = 1; // Standard: Viertelnote
     this.songTitle = "Mein neues Gitarrenstück";
     this.songArtist = "Ich";
+    this.songCategory = "Eigene Lieder";
     this.songBpm = 100;
     this.notes = []; // [{ midi, duration, string, fret, ... }]
     this.selectedIndex = -1;
@@ -38,6 +39,8 @@ export class SongEditorMode {
           <input type="text" id="editor-title" class="editor-input" value="${this.songTitle}">
           <label>Interpret:</label>
           <input type="text" id="editor-artist" class="editor-input" value="${this.songArtist}" style="width: 90px;">
+          <label>Kategorie:</label>
+          <input type="text" id="editor-category" class="editor-input" value="${this.songCategory}" style="width: 100px;" title="Kategorie für die Liederliste (z. B. Rock, Marten, Klassik)">
           <label>BPM:</label>
           <input type="number" id="editor-bpm" class="editor-input" value="${this.songBpm}" min="40" max="220" style="width: 65px;">
         </div>
@@ -77,6 +80,11 @@ export class SongEditorMode {
 
     const artistInput = this.containerEl.querySelector('#editor-artist');
     artistInput.addEventListener('input', (e) => { this.songArtist = e.target.value; });
+
+    const categoryInput = this.containerEl.querySelector('#editor-category');
+    if (categoryInput) {
+      categoryInput.addEventListener('input', (e) => { this.songCategory = e.target.value; });
+    }
 
     const bpmInput = this.containerEl.querySelector('#editor-bpm');
     bpmInput.addEventListener('change', (e) => { this.songBpm = parseInt(e.target.value) || 100; });
@@ -133,7 +141,7 @@ export class SongEditorMode {
       id: "custom_" + Date.now(),
       title: this.songTitle || "Mein Stück",
       artist: this.songArtist || "Ich",
-      category: "Meine Lieder",
+      category: this.songCategory || "Eigene Lieder",
       bpm: this.songBpm || 100,
       timeSignature: [4, 4],
       description: "Erstellt mit dem integrierten Gitarren-Song-Editor",
@@ -342,11 +350,12 @@ export class SongEditorMode {
       return;
     }
 
+    const safeTitle = (this.songTitle || "lied").toLowerCase().replace(/[^a-z0-9_-]/g, '_');
     const songData = {
-      id: "song_" + Date.now(),
+      id: safeTitle || ("song_" + Date.now()),
       title: this.songTitle || "Mein Stück",
       artist: this.songArtist || "Unbekannt",
-      category: "Eigene Lieder",
+      category: this.songCategory || "Eigene Lieder",
       bpm: this.songBpm || 100,
       timeSignature: [4, 4],
       description: "Erstellt mit dem integrierten Gitarren-Song-Editor",
@@ -365,7 +374,6 @@ export class SongEditorMode {
 
     const a = document.createElement('a');
     a.href = url;
-    const safeTitle = (this.songTitle || "lied").toLowerCase().replace(/[^a-z0-9]/g, '_');
     a.download = `${safeTitle}.json`;
     a.click();
     URL.revokeObjectURL(url);
@@ -411,12 +419,15 @@ export class SongEditorMode {
   loadSongData(data) {
     this.songTitle = data.title || "Geladenes Stück";
     this.songArtist = data.artist || "";
+    this.songCategory = data.category || "Eigene Lieder";
     this.songBpm = data.bpm || 100;
 
     const titleInput = this.containerEl.querySelector('#editor-title');
     if (titleInput) titleInput.value = this.songTitle;
     const artistInput = this.containerEl.querySelector('#editor-artist');
     if (artistInput) artistInput.value = this.songArtist;
+    const categoryInput = this.containerEl.querySelector('#editor-category');
+    if (categoryInput) categoryInput.value = this.songCategory;
     const bpmInput = this.containerEl.querySelector('#editor-bpm');
     if (bpmInput) bpmInput.value = this.songBpm;
 
