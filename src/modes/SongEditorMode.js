@@ -1,4 +1,4 @@
-import { createNote } from '../models/Note.js';
+import { createNote, STRINGS } from '../models/Note.js';
 import { Song } from '../models/Song.js';
 import { MidiImporter } from '../midi/MidiImporter.js';
 
@@ -10,6 +10,7 @@ export class SongEditorMode {
     this.containerEl = options.containerEl;
     this.onSongSaved = options.onSongSaved;
     this.onManageSongs = options.onManageSongs;
+    this.onEnsureAudio = options.onEnsureAudio;
 
     this.currentDuration = 1; // Standard: Viertelnote
     this.songTitle = "Mein neues Gitarrenstück";
@@ -18,6 +19,23 @@ export class SongEditorMode {
     this.songBpm = 100;
     this.notes = []; // [{ midi, duration, string, fret, ... }]
     this.selectedIndex = -1;
+
+    // Metronom- und Aufnahme-Zustände
+    this.isMetronomeActive = false;
+    this.isRecording = false;
+    this.isCountIn = false;
+    this.countInRemaining = 4;
+    this.beatAccumulator = 0;
+    this.currentBeat = 0;
+    this.recordingElapsedBeats = 0;
+    this.autoDuration = true;
+    this.useCountIn = true;
+
+    // Gitarren-Noten-Tracking für Audio-Input
+    this.currentDetectedNote = null; // { midi, noteName, startTime, lastSeenTime, startBeat }
+    this.silenceStartTime = 0;
+    this.silenceThresholdMs = 150;
+    this.minNoteDurationMs = 120;
 
     this.isPlayingPreview = false;
     this.previewIndex = 0;
@@ -55,6 +73,8 @@ export class SongEditorMode {
       </div>
 
       <div class="editor-actions">
+        <button id="editor-record-btn" class="btn btn-record" title="Gitarren-Aufnahme im Takt starten oder stoppen (Taste R)">🔴 Gitarren-Aufnahme</button>
+        <button id="editor-metronome-btn" class="btn btn-metronome" title="Metronom im BPM-Takt aktivieren/deaktivieren">🔊 Metronom: Aus <span class="metronome-dot" id="metronome-dot"></span></button>
         <button id="editor-play-btn" class="btn btn-success">▶ Playback</button>
         <button id="editor-save-btn" class="btn btn-primary" title="Speichert das Lied direkt in der Liederliste deines Browsers">⭐ In Liederliste speichern</button>
         <button id="editor-manage-btn" class="btn" title="Gespeicherte eigene Lieder öffnen oder löschen">📁 Eigene Lieder</button>
@@ -67,9 +87,27 @@ export class SongEditorMode {
         </label>
       </div>
 
+      <div class="editor-live-monitor">
+        <div class="editor-monitor-left">
+          <span class="editor-status-text" id="editor-status-text">🎤 Bereit für Gitarreneingabe (BPM: ${this.songBpm})</span>
+          <span class="live-note-badge" id="editor-live-note">--</span>
+          <span id="editor-live-duration" style="color:var(--text-muted); font-size:0.82rem;"></span>
+        </div>
+        <div class="editor-monitor-right">
+          <label class="editor-toggle-label" title="Notenlänge automatisch aus der gemessenen Haltedauer und dem BPM berechnen">
+            <input type="checkbox" id="editor-auto-dur" ${this.autoDuration ? 'checked' : ''}>
+            <span>Dauer aus Spieldauer</span>
+          </label>
+          <label class="editor-toggle-label" title="4 Schläge Einzähler vor Beginn der Aufnahme">
+            <input type="checkbox" id="editor-count-in" ${this.useCountIn ? 'checked' : ''}>
+            <span>Einzähler (4)</span>
+          </label>
+        </div>
+      </div>
+
       <div class="notes-timeline" id="editor-timeline">
         <span style="color:var(--text-muted); font-size:0.85rem; padding: 0 10px;">
-          Klicke auf das Griffbrett oder die Notenlinien, um Noten hinzuzufügen.
+          Klicke auf das Griffbrett oder spiele deine Gitarre (iRig HD 2), um Noten hinzuzufügen.
         </span>
       </div>
     `;
@@ -87,7 +125,32 @@ export class SongEditorMode {
     }
 
     const bpmInput = this.containerEl.querySelector('#editor-bpm');
-    bpmInput.addEventListener('change', (e) => { this.songBpm = parseInt(e.target.value) || 100; });
+    bpmInput.addEventListener('change', (e) => {
+      this.songBpm = parseInt(e.target.value) || 100;
+      if (!this.isRecording && !this.isMetronomeActive) {
+        this.updateStatusText(`🎤 Bereit für Gitarreneingabe (BPM: ${this.songBpm})`);
+      }
+    });
+
+    const recordBtn = this.containerEl.querySelector('#editor-record-btn');
+    if (recordBtn) {
+      recordBtn.addEventListener('click', () => this.toggleRecording());
+    }
+
+    const metronomeBtn = this.containerEl.querySelector('#editor-metronome-btn');
+    if (metronomeBtn) {
+      metronomeBtn.addEventListener('click', () => this.toggleMetronome());
+    }
+
+    const autoDurCheckbox = this.containerEl.querySelector('#editor-auto-dur');
+    if (autoDurCheckbox) {
+      autoDurCheckbox.addEventListener('change', (e) => { this.autoDuration = e.target.checked; });
+    }
+
+    const countInCheckbox = this.containerEl.querySelector('#editor-count-in');
+    if (countInCheckbox) {
+      countInCheckbox.addEventListener('change', (e) => { this.useCountIn = e.target.checked; });
+    }
 
     const durButtons = this.containerEl.querySelectorAll('.duration-btn');
     durButtons.forEach(btn => {
@@ -163,6 +226,7 @@ export class SongEditorMode {
   show() {
     if (this.containerEl) this.containerEl.style.display = 'flex';
     this.scrollToActiveNote();
+    this.updateStatusText(`🎤 Bereit für Gitarreneingabe (BPM: ${this.songBpm})`);
     if (!this.boundWheelHandler && this.staffRenderer.canvas) {
       this.boundWheelHandler = (e) => this.handleWheel(e);
       this.staffRenderer.canvas.addEventListener('wheel', this.boundWheelHandler, { passive: false });
@@ -172,6 +236,8 @@ export class SongEditorMode {
   hide() {
     if (this.containerEl) this.containerEl.style.display = 'none';
     this.stopPlayback();
+    if (this.isRecording) this.stopRecording();
+    if (this.isMetronomeActive) this.toggleMetronome();
     if (this.boundWheelHandler && this.staffRenderer.canvas) {
       this.staffRenderer.canvas.removeEventListener('wheel', this.boundWheelHandler);
       this.boundWheelHandler = null;
@@ -212,18 +278,26 @@ export class SongEditorMode {
     }
   }
 
-  addNote(midi, string = null, fret = null) {
-    let nextBeat = 0;
-    if (this.notes.length > 0) {
-      const last = this.notes[this.notes.length - 1];
-      nextBeat = (last.beat !== undefined ? last.beat : 0) + (last.duration || 1);
+  getNextAvailableBeat() {
+    if (this.notes.length === 0) return 0;
+    const last = this.notes[this.notes.length - 1];
+    return (last.beat !== undefined ? last.beat : 0) + (last.duration || 1);
+  }
+
+  addNote(midi, string = null, fret = null, duration = null, beat = null) {
+    let nextBeat = beat;
+    if (nextBeat === null || nextBeat === undefined) {
+      nextBeat = this.getNextAvailableBeat();
     }
+    const noteDur = (duration !== null && duration !== undefined) ? duration : this.currentDuration;
     const note = {
-      ...createNote(midi, this.currentDuration, string, fret),
+      ...createNote(midi, noteDur, string, fret),
       beat: nextBeat
     };
     this.notes.push(note);
-    this.selectedIndex = this.notes.length - 1;
+    this.notes.sort((a, b) => (a.beat || 0) - (b.beat || 0) || a.midi - b.midi);
+    this.selectedIndex = this.notes.findIndex(n => n === note);
+    if (this.selectedIndex === -1) this.selectedIndex = this.notes.length - 1;
     this.synth.playGuitarNote(midi, 0.4);
     this.fretboardRenderer.highlightMidi(midi, 'correct-flash');
     this.renderTimeline();
@@ -251,6 +325,7 @@ export class SongEditorMode {
   }
 
   renderTimeline() {
+    if (!this.containerEl) return;
     const timeline = this.containerEl.querySelector('#editor-timeline');
     if (!timeline) return;
 
@@ -447,9 +522,338 @@ export class SongEditorMode {
     this.scrollToActiveNote();
   }
 
+  findBestStringAndFret(midi) {
+    const candidates = [];
+    for (let s = 0; s < STRINGS.length; s++) {
+      const f = midi - STRINGS[s].baseMidi;
+      if (f >= 0 && f <= 15) {
+        candidates.push({ string: s, fret: f });
+      }
+    }
+    if (candidates.length === 0) {
+      return { string: null, fret: null };
+    }
+    // Bevorzuge niedrigere Bünde (insbesondere Leersaiten 0 und Bünde 1-4)
+    candidates.sort((a, b) => a.fret - b.fret || b.string - a.string);
+    return candidates[0];
+  }
+
+  calculateDurationFromHoldTime(holdDurationMs) {
+    if (!this.autoDuration) {
+      return this.currentDuration;
+    }
+    const holdSeconds = holdDurationMs / 1000;
+    const beats = holdSeconds * (this.songBpm / 60);
+    // Quantisierung auf 0.5-Schritte (Achtel, Viertel, Halbe, Ganze)
+    return Math.max(0.5, Math.min(4.0, Math.round(beats * 2) / 2));
+  }
+
+  getDurationLabel(dur) {
+    if (dur === 0.5) return '½ Achtel';
+    if (dur === 1.0) return '1 Viertel';
+    if (dur === 1.5) return '1½ punktiert';
+    if (dur === 2.0) return '2 Halbe';
+    if (dur === 3.0) return '3 punktiert';
+    if (dur === 4.0) return '4 Ganze';
+    return `${dur} Beats`;
+  }
+
+  updateLiveMonitorNote(noteName, heldMs, estimatedDur) {
+    if (!this.containerEl) return;
+    const noteBadge = this.containerEl.querySelector('#editor-live-note');
+    const durLabel = this.containerEl.querySelector('#editor-live-duration');
+    if (noteBadge) {
+      noteBadge.innerText = noteName;
+      noteBadge.classList.add('sounding');
+    }
+    if (durLabel) {
+      const secStr = (heldMs / 1000).toFixed(1);
+      durLabel.innerText = `(${secStr}s ➔ ${this.getDurationLabel(estimatedDur)})`;
+    }
+  }
+
+  clearLiveMonitorNote() {
+    if (!this.containerEl) return;
+    const noteBadge = this.containerEl.querySelector('#editor-live-note');
+    const durLabel = this.containerEl.querySelector('#editor-live-duration');
+    if (noteBadge) {
+      noteBadge.innerText = '--';
+      noteBadge.classList.remove('sounding');
+    }
+    if (durLabel) {
+      durLabel.innerText = '';
+    }
+  }
+
+  updateStatusText(text, isRecording = false) {
+    if (!this.containerEl) return;
+    const statusEl = this.containerEl.querySelector('#editor-status-text');
+    if (statusEl) {
+      statusEl.innerText = text;
+      if (isRecording) {
+        statusEl.classList.add('recording');
+      } else {
+        statusEl.classList.remove('recording');
+      }
+    }
+  }
+
+  triggerMetronomeVisual(isAccent) {
+    if (!this.containerEl) return;
+    const dot = this.containerEl.querySelector('#metronome-dot');
+    if (dot) {
+      const cls = isAccent ? 'accent-flash' : 'flash';
+      dot.classList.add(cls);
+      setTimeout(() => dot.classList.remove(cls), 90);
+    }
+  }
+
+  onMetronomeTick() {
+    if (this.isCountIn) {
+      const isAccent = (this.countInRemaining === 4);
+      this.synth.playClick(isAccent);
+      this.triggerMetronomeVisual(isAccent);
+      this.updateStatusText(`⏳ Einzähler: ${this.countInRemaining}...`, true);
+      this.countInRemaining--;
+
+      if (this.countInRemaining < 0) {
+        this.isCountIn = false;
+        this.recordingStartTime = performance.now();
+        this.recordingElapsedBeats = 0;
+        this.currentBeat = 0;
+        this.updateStatusText(`🔴 Aufnahme läuft... (Takt 1 | Schlag 1)`, true);
+        this.synth.playClick(true);
+        this.triggerMetronomeVisual(true);
+      }
+      return;
+    }
+
+    this.currentBeat++;
+    const beatInMeasure = (this.currentBeat % 4);
+    const isAccented = (beatInMeasure === 0);
+    const measureNumber = Math.floor(this.currentBeat / 4) + 1;
+    const displayBeat = beatInMeasure + 1;
+
+    this.synth.playClick(isAccented);
+    this.triggerMetronomeVisual(isAccented);
+
+    if (this.isRecording) {
+      this.updateStatusText(`🔴 Aufnahme läuft... (Takt ${measureNumber} | Schlag ${displayBeat})`, true);
+    } else {
+      this.updateStatusText(`🔊 Metronom: Takt ${measureNumber} | Schlag ${displayBeat} (${this.songBpm} BPM)`);
+    }
+  }
+
+  scrollTimelineWithRecording(beat) {
+    const spacing = this.staffRenderer.noteSpacingUnit;
+    const hitLineX = this.staffRenderer.hitLineX;
+    const canvasWidth = this.staffRenderer.width || 940;
+    const currentX = hitLineX + (beat * spacing);
+    const margin = 200;
+    if (currentX - this.targetScroll > canvasWidth - margin) {
+      this.targetScroll = currentX - (canvasWidth - margin);
+    }
+  }
+
+  toggleMetronome() {
+    this.isMetronomeActive = !this.isMetronomeActive;
+    const btn = this.containerEl.querySelector('#editor-metronome-btn');
+    if (btn) {
+      if (this.isMetronomeActive) {
+        btn.classList.add('active');
+        btn.innerHTML = `🔊 Metronom: An <span class="metronome-dot" id="metronome-dot"></span>`;
+        this.beatAccumulator = 0;
+        this.currentBeat = 0;
+        this.synth.playClick(true);
+        this.triggerMetronomeVisual(true);
+        this.updateStatusText(`🔊 Metronom aktiv (${this.songBpm} BPM)`);
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = `🔊 Metronom: Aus <span class="metronome-dot" id="metronome-dot"></span>`;
+        if (!this.isRecording) {
+          this.updateStatusText(`🎤 Bereit für Gitarreneingabe (BPM: ${this.songBpm})`);
+        }
+      }
+    }
+  }
+
+  async toggleRecording() {
+    if (this.isRecording || this.isCountIn) {
+      this.stopRecording();
+    } else {
+      await this.startRecording();
+    }
+  }
+
+  async startRecording() {
+    if (this.isPlayingPreview) {
+      this.stopPlayback();
+    }
+
+    if (this.onEnsureAudio) {
+      try {
+        await this.onEnsureAudio();
+      } catch (e) {
+        console.warn("Audio-Eingang konnte nicht automatisch aktiviert werden:", e);
+      }
+    }
+
+    this.isRecording = true;
+    this.beatAccumulator = 0;
+    this.currentBeat = 0;
+    this.recordingElapsedBeats = 0;
+
+    const recordBtn = this.containerEl.querySelector('#editor-record-btn');
+    if (recordBtn) {
+      recordBtn.classList.add('recording');
+      recordBtn.innerHTML = `⏹ Aufnahme beenden`;
+    }
+
+    if (this.useCountIn) {
+      this.isCountIn = true;
+      this.countInRemaining = 4;
+      this.updateStatusText(`⏳ Einzähler: 4...`, true);
+      this.synth.playClick(true);
+      this.triggerMetronomeVisual(true);
+      this.countInRemaining--;
+    } else {
+      this.isCountIn = false;
+      this.recordingStartTime = performance.now();
+      this.recordingElapsedBeats = 0;
+      this.updateStatusText(`🔴 Aufnahme läuft... (Takt 1 | Schlag 1)`, true);
+      this.synth.playClick(true);
+      this.triggerMetronomeVisual(true);
+    }
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+    this.isCountIn = false;
+    if (this.currentDetectedNote) {
+      this.finalizeDetectedNote(performance.now());
+    }
+
+    const recordBtn = this.containerEl.querySelector('#editor-record-btn');
+    if (recordBtn) {
+      recordBtn.classList.remove('recording');
+      recordBtn.innerHTML = `🔴 Gitarren-Aufnahme`;
+    }
+
+    this.updateStatusText(this.isMetronomeActive 
+      ? `🔊 Metronom aktiv (${this.songBpm} BPM)` 
+      : `🎤 Bereit für Gitarreneingabe (BPM: ${this.songBpm})`
+    );
+  }
+
+  startDetectedNote(midi, noteName, now) {
+    let startBeat = null;
+    if (this.isRecording && !this.isCountIn) {
+      startBeat = this.recordingElapsedBeats;
+    }
+    this.currentDetectedNote = {
+      midi: midi,
+      noteName: noteName,
+      startTime: now,
+      lastSeenTime: now,
+      startBeat: startBeat
+    };
+    this.silenceStartTime = 0;
+    const initialDur = this.autoDuration ? 0.5 : this.currentDuration;
+    this.updateLiveMonitorNote(noteName, 0, initialDur);
+  }
+
+  finalizeDetectedNote(now) {
+    if (!this.currentDetectedNote) return;
+    const noteInfo = this.currentDetectedNote;
+    this.currentDetectedNote = null;
+    this.silenceStartTime = 0;
+    this.clearLiveMonitorNote();
+
+    const heldMs = noteInfo.lastSeenTime - noteInfo.startTime;
+    if (heldMs < this.minNoteDurationMs) return;
+
+    const duration = this.calculateDurationFromHoldTime(heldMs);
+    const bestPos = this.findBestStringAndFret(noteInfo.midi);
+
+    let noteBeat;
+    if (this.isRecording && noteInfo.startBeat !== null) {
+      // Bei getakteter Aufnahme auf nächsten halben Beat quantisieren
+      noteBeat = Math.max(0, Math.round(noteInfo.startBeat * 2) / 2);
+    } else {
+      // Bei schrittweisem Einspielen an bisherige Noten anhängen
+      noteBeat = this.getNextAvailableBeat();
+    }
+
+    const newNote = {
+      ...createNote(noteInfo.midi, duration, bestPos.string, bestPos.fret),
+      beat: noteBeat
+    };
+
+    this.notes.push(newNote);
+    this.notes.sort((a, b) => (a.beat || 0) - (b.beat || 0) || a.midi - b.midi);
+    this.selectedIndex = this.notes.findIndex(n => n === newNote);
+    if (this.selectedIndex === -1) this.selectedIndex = this.notes.length - 1;
+
+    // Fretboard-Highlight und Gitarrenklang
+    this.synth.playGuitarNote(noteInfo.midi, 0.4);
+    this.fretboardRenderer.highlightMidi(noteInfo.midi, 'correct-flash', 350);
+    this.renderTimeline();
+    this.scrollToActiveNote();
+  }
+
+  processAudioFrame(res, now) {
+    if (!res) return;
+
+    if (res.detected && res.midi !== null) {
+      if (this.currentDetectedNote) {
+        if (this.currentDetectedNote.midi === res.midi) {
+          // Selber Ton wird weiter gehalten
+          this.currentDetectedNote.lastSeenTime = now;
+          this.silenceStartTime = 0;
+          const heldMs = now - this.currentDetectedNote.startTime;
+          const estDur = this.calculateDurationFromHoldTime(heldMs);
+          this.updateLiveMonitorNote(this.currentDetectedNote.noteName, heldMs, estDur);
+        } else {
+          // Anderer Ton angeschlagen -> vorherigen Ton abschließen, neuen beginnen
+          this.finalizeDetectedNote(now);
+          this.startDetectedNote(res.midi, res.noteName, now);
+        }
+      } else {
+        // Neuer Ton beginnt
+        this.startDetectedNote(res.midi, res.noteName, now);
+      }
+    } else {
+      // Kein Ton aktuell erkannt (Saite abgedämpft oder Ton abgeklungen)
+      if (this.currentDetectedNote) {
+        if (!this.silenceStartTime) {
+          this.silenceStartTime = now;
+        }
+        if (now - this.silenceStartTime >= this.silenceThresholdMs) {
+          this.finalizeDetectedNote(now);
+        }
+      }
+    }
+  }
+
   update(dt) {
     // Sanftes Nachführen des Notenbands im Editor
     this.scrollOffset += (this.targetScroll - this.scrollOffset) * Math.min(dt * 12, 1);
+
+    // Metronom- & Aufnahme-Timing
+    if (this.isMetronomeActive || this.isRecording) {
+      const secondsPerBeat = 60 / this.songBpm;
+      this.beatAccumulator += dt;
+
+      while (this.beatAccumulator >= secondsPerBeat) {
+        this.beatAccumulator -= secondsPerBeat;
+        this.onMetronomeTick();
+      }
+
+      if (this.isRecording && !this.isCountIn) {
+        this.recordingElapsedBeats += (dt / secondsPerBeat);
+        this.scrollTimelineWithRecording(this.recordingElapsedBeats);
+      }
+    }
   }
 
   render() {
@@ -488,6 +892,25 @@ export class SongEditorMode {
           isSelected ? 'target' : 'normal',
           accidental
         );
+      }
+    }
+
+    // 3. Rote Aufnahmelinie (Playhead) zeichnen, wenn Aufnahme aktiv
+    if (this.isRecording && !this.isCountIn) {
+      const recX = hitLineX + (this.recordingElapsedBeats * spacing) - this.scrollOffset;
+      if (recX >= 40 && recX <= width + 40) {
+        const ctx = this.staffRenderer.ctx;
+        if (ctx) {
+          ctx.save();
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([4, 3]);
+          ctx.beginPath();
+          ctx.moveTo(recX, 10);
+          ctx.lineTo(recX, 190);
+          ctx.stroke();
+          ctx.restore();
+        }
       }
     }
   }

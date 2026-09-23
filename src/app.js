@@ -114,7 +114,8 @@ class GuitarApp {
       synth: this.synth,
       containerEl: this.editorContainerEl,
       onSongSaved: (song) => this.registerNewSong(song),
-      onManageSongs: () => this.openManageSongsModal()
+      onManageSongs: () => this.openManageSongsModal(),
+      onEnsureAudio: () => this.connectAudio('irig')
     });
 
     this.listenMode = new ListenMode({
@@ -261,16 +262,23 @@ class GuitarApp {
       });
     }
 
-    // Leertaste zum Starten/Stoppen im Rhythmus- und Anhören-Modus
+    // Leertaste & Tasten-Shortcuts
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && (this.currentModeName === 'rhythm' || this.currentModeName === 'listen')) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-          e.preventDefault();
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+        if (e.code === 'Space') {
           if (this.currentModeName === 'rhythm') {
+            e.preventDefault();
             this.toggleRhythmPlayback();
           } else if (this.currentModeName === 'listen') {
+            e.preventDefault();
             this.toggleListenPlayback();
+          } else if (this.currentModeName === 'editor') {
+            e.preventDefault();
+            this.editorMode.togglePlayback();
           }
+        } else if (e.code === 'KeyR' && this.currentModeName === 'editor') {
+          e.preventDefault();
+          this.editorMode.toggleRecording();
         }
       }
     });
@@ -843,6 +851,10 @@ class GuitarApp {
               this.endlessMode.evaluateNote(detectedMidi);
             }
           });
+
+          if (this.currentModeName === 'editor') {
+            this.editorMode.processAudioFrame(res, now);
+          }
 
           // Pitch-Display & Level-Meter aktualisieren
           this.pitchDisplay.innerText = res.noteName;

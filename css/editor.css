@@ -126,3 +126,132 @@
 .note-chip-del:hover {
   color: #f87171;
 }
+
+/* Record & Metronome Controls */
+.btn-record {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #ef4444;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-record:hover {
+  background: #b91c1c;
+}
+
+.btn-record.recording {
+  background: #7f1d1d;
+  border-color: #f87171;
+  animation: pulse-red 1.2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.btn-metronome {
+  background: #374151;
+  color: #f3f4f6;
+  border: 1px solid #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-metronome.active {
+  background: #16a34a;
+  border-color: #22c55e;
+  color: #ffffff;
+}
+
+.metronome-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4b5563;
+  transition: background 0.05s ease, transform 0.05s ease;
+}
+
+.metronome-dot.flash {
+  background: #eab308;
+  transform: scale(1.35);
+  box-shadow: 0 0 8px #eab308;
+}
+
+.metronome-dot.accent-flash {
+  background: #ef4444;
+  transform: scale(1.5);
+  box-shadow: 0 0 10px #ef4444;
+}
+
+/* Editor Live Monitor Bar */
+.editor-live-monitor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #111317;
+  border: 1px solid #2e3440;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.editor-monitor-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.editor-monitor-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editor-status-text {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.editor-status-text.recording {
+  color: #f87171;
+  font-weight: 700;
+}
+
+.live-note-badge {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #38bdf8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.live-note-badge.sounding {
+  background: #065f46;
+  border-color: #10b981;
+  color: #a7f3d0;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.editor-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  user-select: none;
+}
