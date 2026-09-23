@@ -264,7 +264,7 @@ class GuitarApp {
 
     // Leertaste & Tasten-Shortcuts
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
         if (e.code === 'Space') {
           if (this.currentModeName === 'rhythm') {
             e.preventDefault();
@@ -279,6 +279,29 @@ class GuitarApp {
         } else if (e.code === 'KeyR' && this.currentModeName === 'editor') {
           e.preventDefault();
           this.editorMode.toggleRecording();
+        } else if (this.currentModeName === 'editor') {
+          if (e.code === 'ArrowLeft') {
+            e.preventDefault();
+            this.editorMode.selectPreviousNote();
+          } else if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            this.editorMode.selectNextNote();
+          } else if (e.code === 'Delete' || e.code === 'Backspace') {
+            e.preventDefault();
+            this.editorMode.removeSelectedNote();
+          } else if (e.code === 'Digit1' || e.code === 'Numpad1') {
+            e.preventDefault();
+            this.editorMode.setDuration(1);
+          } else if (e.code === 'Digit2' || e.code === 'Numpad2') {
+            e.preventDefault();
+            this.editorMode.setDuration(2);
+          } else if (e.code === 'Digit4' || e.code === 'Numpad4') {
+            e.preventDefault();
+            this.editorMode.setDuration(4);
+          } else if (e.code === 'Digit8' || e.code === 'Numpad8' || e.code === 'Digit5' || e.code === 'Numpad5') {
+            e.preventDefault();
+            this.editorMode.setDuration(0.5);
+          }
         }
       }
     });

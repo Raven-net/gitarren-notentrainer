@@ -79,7 +79,7 @@ export class SongEditorMode {
         <button id="editor-save-btn" class="btn btn-primary" title="Speichert das Lied direkt in der Liederliste deines Browsers">⭐ In Liederliste speichern</button>
         <button id="editor-manage-btn" class="btn" title="Gespeicherte eigene Lieder öffnen oder löschen">📁 Eigene Lieder</button>
         <button id="editor-export-btn" class="btn">💾 Als JSON exportieren</button>
-        <button id="editor-undo-btn" class="btn">↶ Letzte Note löschen</button>
+        <button id="editor-undo-btn" class="btn" title="Markierte Note oder letzte Note löschen (Entf / Backspace)">⌫ Note löschen</button>
         <button id="editor-clear-btn" class="btn btn-danger">Alle löschen</button>
         <label class="btn" style="cursor:pointer;">
           📂 JSON / MIDI laden
@@ -155,9 +155,8 @@ export class SongEditorMode {
     const durButtons = this.containerEl.querySelectorAll('.duration-btn');
     durButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        durButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.currentDuration = parseFloat(btn.dataset.dur);
+        const dur = parseFloat(btn.dataset.dur);
+        this.setDuration(dur);
       });
     });
 
@@ -165,13 +164,15 @@ export class SongEditorMode {
     playBtn.addEventListener('click', () => this.togglePlayback());
 
     const undoBtn = this.containerEl.querySelector('#editor-undo-btn');
-    undoBtn.addEventListener('click', () => this.removeLastNote());
+    undoBtn.addEventListener('click', () => this.removeSelectedNote());
 
     const clearBtn = this.containerEl.querySelector('#editor-clear-btn');
     clearBtn.addEventListener('click', () => {
       if (confirm("Wirklich alle Noten aus dem Editor löschen?")) {
         this.notes = [];
+        this.selectedIndex = -1;
         this.renderTimeline();
+        this.scrollToActiveNote();
       }
     });
 
@@ -231,6 +232,10 @@ export class SongEditorMode {
       this.boundWheelHandler = (e) => this.handleWheel(e);
       this.staffRenderer.canvas.addEventListener('wheel', this.boundWheelHandler, { passive: false });
     }
+    if (!this.boundCanvasClickHandler && this.staffRenderer.canvas) {
+      this.boundCanvasClickHandler = (e) => this.handleCanvasClick(e);
+      this.staffRenderer.canvas.addEventListener('click', this.boundCanvasClickHandler);
+    }
   }
 
   hide() {
@@ -242,12 +247,125 @@ export class SongEditorMode {
       this.staffRenderer.canvas.removeEventListener('wheel', this.boundWheelHandler);
       this.boundWheelHandler = null;
     }
+    if (this.boundCanvasClickHandler && this.staffRenderer.canvas) {
+      this.staffRenderer.canvas.removeEventListener('click', this.boundCanvasClickHandler);
+      this.boundCanvasClickHandler = null;
+    }
   }
 
   handleWheel(e) {
     e.preventDefault();
     const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
     this.targetScroll = Math.max(0, this.targetScroll + delta * 0.75);
+  }
+
+  handleCanvasClick(e) {
+    if (!this.staffRenderer || !this.staffRenderer.canvas || this.notes.length === 0) return;
+    const rect = this.staffRenderer.canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    const spacing = this.staffRenderer.noteSpacingUnit;
+    const hitLineX = this.staffRenderer.hitLineX;
+
+    let closestIdx = -1;
+    let minDistance = 28; // Klicktoleranz in Pixeln
+
+    for (let i = 0; i < this.notes.length; i++) {
+      const note = this.notes[i];
+      const noteBeat = note.beat !== undefined ? note.beat : i;
+      const noteX = hitLineX + (noteBeat * spacing) - this.scrollOffset;
+      const noteY = this.staffRenderer.getYForStep(note.diatonicStep);
+
+      const dx = clickX - noteX;
+      const dy = clickY - noteY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIdx = i;
+      }
+    }
+
+    if (closestIdx !== -1) {
+      this.selectNote(closestIdx);
+    }
+  }
+
+  selectNote(index) {
+    if (index < 0 || index >= this.notes.length) return;
+    this.selectedIndex = index;
+    const note = this.notes[index];
+    this.synth.playGuitarNote(note.midi, 0.35);
+    this.fretboardRenderer.highlightMidi(note.midi, 'correct-flash');
+    if (note.duration) {
+      this.currentDuration = note.duration;
+      this.updateDurationButtons(note.duration);
+    }
+    this.renderTimeline();
+    this.scrollToActiveNote();
+  }
+
+  selectPreviousNote() {
+    if (this.notes.length === 0) return;
+    if (this.selectedIndex > 0) {
+      this.selectNote(this.selectedIndex - 1);
+    } else if (this.selectedIndex === -1) {
+      this.selectNote(this.notes.length - 1);
+    }
+  }
+
+  selectNextNote() {
+    if (this.notes.length === 0) return;
+    if (this.selectedIndex < this.notes.length - 1) {
+      this.selectNote(this.selectedIndex + 1);
+    }
+  }
+
+  removeSelectedNote() {
+    if (this.selectedIndex >= 0 && this.selectedIndex < this.notes.length) {
+      this.removeNoteAt(this.selectedIndex);
+    } else if (this.notes.length > 0) {
+      this.removeLastNote();
+    }
+  }
+
+  setDuration(dur) {
+    this.currentDuration = dur;
+    this.updateDurationButtons(dur);
+
+    // Falls eine Note markiert ist, ihre Dauer ändern und folgende Noten nachrücken/aufrücken
+    if (this.selectedIndex >= 0 && this.selectedIndex < this.notes.length) {
+      this.changeSelectedNoteDuration(dur);
+    }
+  }
+
+  updateDurationButtons(dur) {
+    if (!this.containerEl) return;
+    const durButtons = this.containerEl.querySelectorAll('.duration-btn');
+    durButtons.forEach(b => {
+      b.classList.toggle('active', parseFloat(b.dataset.dur) === dur);
+    });
+  }
+
+  changeSelectedNoteDuration(newDuration) {
+    if (this.selectedIndex < 0 || this.selectedIndex >= this.notes.length) return;
+    const note = this.notes[this.selectedIndex];
+    const oldDuration = note.duration || 1;
+    const delta = newDuration - oldDuration;
+    if (delta === 0) return;
+
+    note.duration = newDuration;
+
+    // Alle nachfolgenden Noten um delta verschieben (nachrücken oder aufrücken)
+    for (let i = this.selectedIndex + 1; i < this.notes.length; i++) {
+      const nextNote = this.notes[i];
+      const curBeat = nextNote.beat !== undefined ? nextNote.beat : i;
+      nextNote.beat = Math.max(0, curBeat + delta);
+    }
+
+    this.renderTimeline();
+    this.scrollToActiveNote();
   }
 
   scrollToActiveNote() {
@@ -285,19 +403,47 @@ export class SongEditorMode {
   }
 
   addNote(midi, string = null, fret = null, duration = null, beat = null) {
-    let nextBeat = beat;
-    if (nextBeat === null || nextBeat === undefined) {
-      nextBeat = this.getNextAvailableBeat();
-    }
     const noteDur = (duration !== null && duration !== undefined) ? duration : this.currentDuration;
     const note = {
       ...createNote(midi, noteDur, string, fret),
-      beat: nextBeat
+      beat: 0
     };
-    this.notes.push(note);
-    this.notes.sort((a, b) => (a.beat || 0) - (b.beat || 0) || a.midi - b.midi);
-    this.selectedIndex = this.notes.findIndex(n => n === note);
-    if (this.selectedIndex === -1) this.selectedIndex = this.notes.length - 1;
+
+    if (beat !== null && beat !== undefined) {
+      // Spezifischer Beat (z. B. getaktete Live-Aufnahme)
+      note.beat = beat;
+      this.notes.push(note);
+      this.notes.sort((a, b) => (a.beat || 0) - (b.beat || 0) || a.midi - b.midi);
+      this.selectedIndex = this.notes.findIndex(n => n === note);
+      if (this.selectedIndex === -1) this.selectedIndex = this.notes.length - 1;
+    } else {
+      // Nach der aktuell markierten Note einfügen (oder am Ende)
+      if (this.selectedIndex >= 0 && this.selectedIndex < this.notes.length) {
+        const prevNote = this.notes[this.selectedIndex];
+        const prevBeat = prevNote.beat !== undefined ? prevNote.beat : 0;
+        const prevDur = prevNote.duration || 1;
+        const insertBeat = prevBeat + prevDur;
+        note.beat = insertBeat;
+
+        const insertIndex = this.selectedIndex + 1;
+
+        // Alle nachfolgenden Noten um noteDur nach rechts verschieben
+        for (let i = insertIndex; i < this.notes.length; i++) {
+          const nextNote = this.notes[i];
+          const curBeat = nextNote.beat !== undefined ? nextNote.beat : i;
+          nextNote.beat = curBeat + noteDur;
+        }
+
+        this.notes.splice(insertIndex, 0, note);
+        this.selectedIndex = insertIndex;
+      } else {
+        // Noch keine Note markiert oder Notenliste leer -> am Ende anfügen
+        note.beat = this.getNextAvailableBeat();
+        this.notes.push(note);
+        this.selectedIndex = this.notes.length - 1;
+      }
+    }
+
     this.synth.playGuitarNote(midi, 0.4);
     this.fretboardRenderer.highlightMidi(midi, 'correct-flash');
     this.renderTimeline();
@@ -306,19 +452,32 @@ export class SongEditorMode {
 
   removeLastNote() {
     if (this.notes.length > 0) {
-      this.notes.pop();
-      this.selectedIndex = this.notes.length - 1;
-      this.renderTimeline();
-      this.scrollToActiveNote();
+      this.removeNoteAt(this.notes.length - 1);
     }
   }
 
   removeNoteAt(index) {
     if (index >= 0 && index < this.notes.length) {
+      const removedNote = this.notes[index];
+      const removedDur = removedNote.duration || 1;
       this.notes.splice(index, 1);
-      if (this.selectedIndex >= this.notes.length) {
-        this.selectedIndex = this.notes.length - 1;
+
+      // Alle nachfolgenden Noten nach links rücken (Lücke nahtlos schließen)
+      for (let i = index; i < this.notes.length; i++) {
+        const nextNote = this.notes[i];
+        const curBeat = nextNote.beat !== undefined ? nextNote.beat : i + 1;
+        nextNote.beat = Math.max(0, curBeat - removedDur);
       }
+
+      // Markierung anpassen
+      if (this.notes.length === 0) {
+        this.selectedIndex = -1;
+      } else if (this.selectedIndex >= this.notes.length) {
+        this.selectedIndex = this.notes.length - 1;
+      } else if (this.selectedIndex > index) {
+        this.selectedIndex--;
+      }
+
       this.renderTimeline();
       this.scrollToActiveNote();
     }
@@ -332,7 +491,7 @@ export class SongEditorMode {
     if (this.notes.length === 0) {
       timeline.innerHTML = `
         <span style="color:var(--text-muted); font-size:0.85rem; padding: 0 10px;">
-          Klicke auf das Griffbrett, um Noten einzufügen (Dauer: ${this.currentDuration}).
+          Klicke auf das Griffbrett oder spiele deine Gitarre (iRig HD 2), um Noten hinzuzufügen.
         </span>
       `;
       return;
@@ -342,27 +501,34 @@ export class SongEditorMode {
     this.notes.forEach((note, idx) => {
       const chip = document.createElement('div');
       chip.className = `note-chip ${idx === this.selectedIndex ? 'selected' : ''}`;
+
+      const durText = note.duration === 4 ? '1/1' :
+                      note.duration === 2 ? '1/2' :
+                      note.duration === 1 ? '1/4' :
+                      note.duration === 0.5 ? '1/8' : `${note.duration}`;
+
       chip.innerHTML = `
-        <span>#${idx + 1} <b>${note.name}</b> (${note.duration})</span>
-        <span class="note-chip-del" title="Löschen">×</span>
+        <span>#${idx + 1} <b>${note.name}</b> <small style="opacity:0.8;">(${durText})</small></span>
+        <span class="note-chip-del" title="Note löschen">×</span>
       `;
 
       chip.addEventListener('click', (e) => {
         if (e.target.classList.contains('note-chip-del')) {
+          e.stopPropagation();
           this.removeNoteAt(idx);
         } else {
-          this.selectedIndex = idx;
-          this.synth.playGuitarNote(note.midi, 0.4);
-          this.renderTimeline();
-          this.scrollToActiveNote();
+          this.selectNote(idx);
         }
       });
 
       timeline.appendChild(chip);
     });
 
-    // Ans Ende scrollen
-    timeline.scrollLeft = timeline.scrollWidth;
+    // Ausgewählten Chip ins Blickfeld scrollen
+    const selectedChip = timeline.children[this.selectedIndex];
+    if (selectedChip) {
+      selectedChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   togglePlayback() {
@@ -775,30 +941,14 @@ export class SongEditorMode {
     const duration = this.calculateDurationFromHoldTime(heldMs);
     const bestPos = this.findBestStringAndFret(noteInfo.midi);
 
-    let noteBeat;
+    let noteBeat = null;
     if (this.isRecording && noteInfo.startBeat !== null) {
       // Bei getakteter Aufnahme auf nächsten halben Beat quantisieren
       noteBeat = Math.max(0, Math.round(noteInfo.startBeat * 2) / 2);
-    } else {
-      // Bei schrittweisem Einspielen an bisherige Noten anhängen
-      noteBeat = this.getNextAvailableBeat();
     }
 
-    const newNote = {
-      ...createNote(noteInfo.midi, duration, bestPos.string, bestPos.fret),
-      beat: noteBeat
-    };
-
-    this.notes.push(newNote);
-    this.notes.sort((a, b) => (a.beat || 0) - (b.beat || 0) || a.midi - b.midi);
-    this.selectedIndex = this.notes.findIndex(n => n === newNote);
-    if (this.selectedIndex === -1) this.selectedIndex = this.notes.length - 1;
-
-    // Fretboard-Highlight und Gitarrenklang
-    this.synth.playGuitarNote(noteInfo.midi, 0.4);
-    this.fretboardRenderer.highlightMidi(noteInfo.midi, 'correct-flash', 350);
-    this.renderTimeline();
-    this.scrollToActiveNote();
+    // Delegiert an addNote, welches Einfügen nach der markierten Note und Taktverschiebung beherrscht
+    this.addNote(noteInfo.midi, bestPos.string, bestPos.fret, duration, noteBeat);
   }
 
   processAudioFrame(res, now) {
